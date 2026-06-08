@@ -1173,10 +1173,10 @@ async function addMember() {
   const name=document.getElementById('new-mem-name').value.trim();
   const date=document.getElementById('new-mem-date').value;
   if(!name||!date){showToast('❌ নাম ও তারিখ দিন');return;}
-  const d=loadData();
-  const id='M'+String(d.members.length+1).padStart(3,'0');
+  // Use timestamp for unique ID — no conflict ever
+  const id='M_'+Date.now();
   await fbWrite(`ucdata/members/${id}`,{id,name,joinDate:date,status:'Active',extraShares:0});
-  showToast('✅ সদস্য যোগ হয়েছে! Ownership পুনর্গণনা হয়েছে।');
+  showToast('✅ সদস্য যোগ হয়েছে!');
   document.getElementById('new-mem-name').value='';
   document.getElementById('new-mem-date').value='';
 }
