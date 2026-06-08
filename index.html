@@ -980,6 +980,10 @@ function renderMemberProfile() {
       <div style="text-align:center;margin-bottom:13px;">
         <div style="font-size:17px;font-weight:700;color:var(--gold);">${m.name}</div>
         <div style="font-size:11px;color:var(--text2);">যোগদান: ${m.joinDate} · ${m.status==='Active'?'✅ সক্রিয়':'❌ বের হয়েছেন'}</div>
+        ${currentRole==='editor'?`<div class="action-row" style="margin-top:10px;justify-content:center;">
+          <button class="btn-edit" onclick="editMember('${m.id}')">✏️ এডিট</button>
+          <button class="btn-del" onclick="deleteMember('${m.id}')">🗑️ মুছুন</button>
+        </div>`:''}
       </div>
       <div class="member-grid">
         <div class="member-stat"><div class="ms-val">${fmt(principal)}</div><div class="ms-lbl">মূল জমা</div></div>
@@ -1082,6 +1086,46 @@ function memTab(name,el) {
   ['profile','transfer','add','exit'].forEach(n=>document.getElementById('mem-'+n+'-panel').style.display=n===name?'block':'none');
   if(name==='exit') showExitPreview();
   if(name==='transfer') renderTransferHistory();
+}
+
+function editMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  if(!m) return;
+  document.getElementById('edit-modal-title').textContent='সদস্য এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="e-mem-name" value="${m.name}"></div>
+    <div class="form-group"><label>যোগদানের তারিখ</label><input type="date" id="e-mem-date" value="${m.joinDate}"></div>
+    <div class="form-group"><label>স্ট্যাটাস</label>
+      <select id="e-mem-status">
+        <option value="Active" ${m.status==='Active'?'selected':''}>✅ সক্রিয়</option>
+        <option value="Exited" ${m.status==='Exited'?'selected':''}>❌ বের হয়েছেন</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditMember('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteMember('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditMember(id) {
+  const name=document.getElementById('e-mem-name').value.trim();
+  const joinDate=document.getElementById('e-mem-date').value;
+  const status=document.getElementById('e-mem-status').value;
+  if(!name){showToast('❌ নাম দিন');return;}
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{name,joinDate,status});
+  closeModal();showToast('✅ সদস্য আপডেট হয়েছে!');
+}
+
+async function deleteMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  if(!m) return;
+  if(!confirm(`"${m.name}" কে মুছে ফেলবেন?`)) return;
+  await fbDelete(`ucdata/members/${id}`);
+  selectedMemberId=null;
+  closeModal();showToast('🗑️ সদস্য মুছে ফেলা হয়েছে');
 }
 
 function showExitPreview() {
