@@ -333,9 +333,14 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro
       <div id="mem-transfer-panel" style="display:none;">
         <div class="card">
           <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;">🔄 শেয়ার ট্রান্সফার</div>
-          <div class="form-group"><label>বিক্রেতা (যে বেচবে)</label><select id="transfer-from"></select></div>
-          <div class="form-group"><label>ক্রেতা (যে কিনবে)</label><select id="transfer-to"></select></div>
-          <div class="form-group"><label>ট্রান্সফার % (মালিকানার কত অংশ)</label><input type="number" id="transfer-pct" placeholder="যেমন: 5 মানে ৫%" step="0.01" max="100" oninput="previewTransfer()"></div>
+          <div class="form-group"><label>বিক্রেতা (যে বেচবে)</label><select id="transfer-from" onchange="previewTransfer()"></select></div>
+          <div id="buyers-list">
+            <div class="form-row" id="buyer-row-0">
+              <div class="form-group"><label>ক্রেতা ১</label><select class="buyer-select" data-idx="0"></select></div>
+              <div class="form-group"><label>% পরিমাণ</label><input type="number" class="buyer-pct" data-idx="0" placeholder="৫" step="0.01" oninput="previewTransfer()"></div>
+            </div>
+          </div>
+          <button onclick="addBuyerRow()" style="width:100%;padding:8px;background:var(--navy3);border:1px solid var(--border);color:var(--text2);border-radius:8px;font-size:12px;cursor:pointer;margin-bottom:12px;">+ আরেকজন ক্রেতা যোগ করুন</button>
           <div id="transfer-preview" style="margin-bottom:12px;"></div>
           <button class="btn btn-gold" onclick="doShareTransfer()">✅ শেয়ার ট্রান্সফার করুন</button>
           <p style="font-size:10px;color:var(--text2);margin-top:8px;text-align:center;">সর্বসম্মত অনুমোদন আবশ্যক</p>
@@ -357,6 +362,8 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro
           <div id="exit-preview" style="margin-bottom:13px;"></div>
           <button class="btn btn-red" onclick="processMemberExit()">🚪 Exit প্রক্রিয়া করুন</button>
         </div>
+        <div class="sec-head" style="margin-top:8px;">Exit হওয়া সদস্য</div>
+        <div id="exited-members-list"></div>
       </div>
     </div>
 
@@ -953,7 +960,31 @@ function renderMembersPage() {
   if(tf) tf.innerHTML=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
   if(tt) tt.innerHTML=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
   if(em){ em.innerHTML=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); showExitPreview(); }
+  // Populate buyer selects
+  populateBuyerSelects();
   renderTransferHistory();
+}
+
+function populateBuyerSelects() {
+  const d=loadData();
+  const active=d.members.filter(m=>m.status==='Active');
+  const opts=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  document.querySelectorAll('.buyer-select').forEach(sel=>{ sel.innerHTML=opts; });
+}
+
+function addBuyerRow() {
+  const list=document.getElementById('buyers-list');
+  const idx=list.children.length;
+  const d=loadData();
+  const active=d.members.filter(m=>m.status==='Active');
+  const opts=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  const row=document.createElement('div');
+  row.className='form-row';
+  row.id=`buyer-row-${idx}`;
+  row.innerHTML=`
+    <div class="form-group"><label>ক্রেতা ${idx+1}</label><select class="buyer-select" data-idx="${idx}">${opts}</select></div>
+    <div class="form-group"><label>% পরিমাণ</label><input type="number" class="buyer-pct" data-idx="${idx}" placeholder="৫" step="0.01" oninput="previewTransfer()"></div>`;
+  list.appendChild(row);
 }
 
 function selectMember(id,el) {
@@ -1011,48 +1042,76 @@ function renderMemberProfile() {
 
 // SHARE TRANSFER
 function previewTransfer() {
-  const fromId=document.getElementById('transfer-from').value;
-  const toId=document.getElementById('transfer-to').value;
-  const pct=parseFloat(document.getElementById('transfer-pct').value)||0;
+  const fromId=document.getElementById('transfer-from')?.value;
+  if(!fromId) return;
   const s=calcStats();
   const d=loadData();
   const fromName=d.members.find(m=>m.id===fromId)?.name||'?';
-  const toName=d.members.find(m=>m.id===toId)?.name||'?';
   const fromOwn=(s.ownership[fromId]||0)*100;
-  const value=s.totalAssets*(pct/100);
+  // Get all buyers
+  const buyers=[];
+  document.querySelectorAll('.buyer-pct').forEach(inp=>{
+    const idx=inp.dataset.idx;
+    const sel=document.querySelector(`.buyer-select[data-idx="${idx}"]`);
+    const pct=parseFloat(inp.value)||0;
+    if(sel && pct>0) buyers.push({id:sel.value, name:d.members.find(m=>m.id===sel.value)?.name||'?', pct});
+  });
+  const totalPct=buyers.reduce((s,b)=>s+b.pct,0);
+  const value=s.totalAssets*(totalPct/100);
+  let rows=buyers.map(b=>`<div class="list-row"><span>${b.name}</span><span style="color:var(--green);">+${b.pct}%</span></div>`).join('');
   document.getElementById('transfer-preview').innerHTML=`
     <div class="card" style="background:var(--navy3);">
-      <div class="list-row"><span>${fromName} এর বর্তমান মালিকানা</span><span>${fromOwn.toFixed(2)}%</span></div>
-      <div class="list-row"><span>ট্রান্সফার হবে</span><span>${pct}%</span></div>
+      <div class="list-row"><span>${fromName} এর মালিকানা</span><span>${fromOwn.toFixed(2)}%</span></div>
+      <div class="list-row"><span>মোট ট্রান্সফার</span><span style="color:var(--red);">-${totalPct}%</span></div>
+      ${rows}
       <div class="list-row"><span>আনুমানিক মূল্য</span><span>${fmt(value)}</span></div>
-      <div class="list-row"><span>প্রাপক</span><span>${toName}</span></div>
     </div>`;
 }
 
 async function doShareTransfer() {
   if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
   const fromId=document.getElementById('transfer-from').value;
-  const toId=document.getElementById('transfer-to').value;
-  const pct=parseFloat(document.getElementById('transfer-pct').value)||0;
-  if(fromId===toId){showToast('❌ একই সদস্য নির্বাচন করা যাবে না');return;}
-  if(!pct||pct<=0){showToast('❌ % দিন');return;}
-  const s=calcStats();
-  if((s.ownership[fromId]||0)*100<pct){showToast('❌ এত বেশি শেয়ার নেই');return;}
-  if(!confirm(`শেয়ার ট্রান্সফার নিশ্চিত করুন?`)) return;
   const d=loadData();
+  const s=calcStats();
   const fromMem=d.members.find(m=>m.id===fromId);
-  const toMem=d.members.find(m=>m.id===toId);
-  // Update extra shares
-  const fromExtra=(parseFloat(fromMem.extraShares)||0)-pct;
-  const toExtra=(parseFloat(toMem.extraShares)||0)+pct;
+  // Get all buyers
+  const buyers=[];
+  document.querySelectorAll('.buyer-pct').forEach(inp=>{
+    const idx=inp.dataset.idx;
+    const sel=document.querySelector(`.buyer-select[data-idx="${idx}"]`);
+    const pct=parseFloat(inp.value)||0;
+    if(sel && pct>0) buyers.push({id:sel.value,pct});
+  });
+  if(!buyers.length){showToast('❌ ক্রেতা ও % দিন');return;}
+  const totalPct=buyers.reduce((s,b)=>s+b.pct,0);
+  if((s.ownership[fromId]||0)*100<totalPct){showToast('❌ এত বেশি শেয়ার নেই');return;}
+  if(buyers.some(b=>b.id===fromId)){showToast('❌ বিক্রেতা ক্রেতা হতে পারবে না');return;}
+  if(!confirm(`মোট ${totalPct}% শেয়ার ট্রান্সফার নিশ্চিত করুন?`)) return;
+  // Update seller
+  const fromExtra=(parseFloat(fromMem.extraShares)||0)-totalPct;
   await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${fromId}`),{extraShares:fromExtra});
-  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${toId}`),{extraShares:toExtra});
+  // Update each buyer
+  const buyerNames=[];
+  for(const b of buyers){
+    const bMem=d.members.find(m=>m.id===b.id);
+    const bExtra=(parseFloat(bMem.extraShares)||0)+b.pct;
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${b.id}`),{extraShares:bExtra});
+    buyerNames.push(`${bMem.name}(${b.pct}%)`);
+  }
   // Log transfer
   const id='tr_'+Date.now();
-  await fbWrite(`ucdata/transfers/${id}`,{id,fromId,fromName:fromMem.name,toId,toName:toMem.name,pct,date:new Date().toISOString().slice(0,10),createdAt:new Date().toISOString()});
-  showToast(`✅ ${pct}% শেয়ার ট্রান্সফার সম্পন্ন!`);
-  document.getElementById('transfer-pct').value='';
+  await fbWrite(`ucdata/transfers/${id}`,{
+    id,fromId,fromName:fromMem.name,
+    buyers:buyers.map(b=>({id:b.id,name:d.members.find(m=>m.id===b.id)?.name,pct:b.pct})),
+    totalPct,date:new Date().toISOString().slice(0,10),createdAt:new Date().toISOString()
+  });
+  showToast(`✅ ${totalPct}% শেয়ার ট্রান্সফার সম্পন্ন!`);
+  // Reset form
+  document.querySelectorAll('.buyer-pct').forEach(inp=>inp.value='');
   document.getElementById('transfer-preview').innerHTML='';
+  // Remove extra buyer rows
+  const list=document.getElementById('buyers-list');
+  while(list.children.length>1) list.removeChild(list.lastChild);
 }
 
 function renderTransferHistory() {
@@ -1060,11 +1119,53 @@ function renderTransferHistory() {
   const el=document.getElementById('transfer-history');
   if(!el) return;
   if(!d.transfers.length){el.innerHTML='<div class="empty"><div class="e-icon">🔄</div>কোনো ট্রান্সফার নেই</div>';return;}
-  el.innerHTML=[...d.transfers].sort((a,b)=>b.createdAt>a.createdAt?1:-1).map(t=>`
-    <div class="list-item">
-      <div class="list-row"><span>${t.fromName} → ${t.toName}</span><span style="color:var(--gold);">${t.pct}%</span></div>
+  el.innerHTML=[...d.transfers].sort((a,b)=>b.createdAt>a.createdAt?1:-1).map(t=>{
+    // Support both old (single buyer) and new (multiple buyers) format
+    let buyerText='';
+    if(t.buyers && t.buyers.length) {
+      buyerText=t.buyers.map(b=>`${b.name}(${b.pct}%)`).join(', ');
+    } else {
+      buyerText=`${t.toName||'?'}(${t.pct}%)`;
+    }
+    return `<div class="list-item">
+      <div class="list-row"><span>${t.fromName} →</span><span style="color:var(--gold);">${t.totalPct||t.pct}% মোট</span></div>
+      <div style="font-size:11px;color:var(--text2);margin:3px 0;">ক্রেতা: ${buyerText}</div>
       <div class="list-row" style="font-size:10px;"><span>তারিখ</span><span>${t.date}</span></div>
-    </div>`).join('');
+      ${currentRole==='editor'?`<div class="action-row"><button class="btn-edit" onclick="editTransfer('${t.id}')">✏️ এডিট</button><button class="btn-del" onclick="deleteTransfer('${t.id}')">🗑️</button></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function editTransfer(id) {
+  const d=loadData();
+  const t=d.transfers.find(x=>x.id===id);
+  if(!t) return;
+  document.getElementById('edit-modal-title').textContent='ট্রান্সফার এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>তারিখ</label><input type="date" id="e-tr-date" value="${t.date}"></div>
+    <div style="background:var(--navy3);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--text2);">
+      বিক্রেতা: <strong style="color:var(--gold);">${t.fromName}</strong><br>
+      মোট: <strong style="color:var(--red);">${t.totalPct||t.pct}%</strong>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-gold" onclick="saveEditTransfer('${id}')">✅ তারিখ আপডেট</button>
+      <button class="btn btn-red" onclick="deleteTransfer('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditTransfer(id) {
+  const date=document.getElementById('e-tr-date').value;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/transfers/${id}`),{date});
+  closeModal();showToast('✅ তারিখ আপডেট হয়েছে!');
+}
+
+async function deleteTransfer(id) {
+  const d=loadData();
+  const t=d.transfers.find(x=>x.id===id);
+  if(!t||!confirm('এই ট্রান্সফার রেকর্ড মুছবেন?\n⚠️ শেয়ার % ফেরত যাবে না!')) return;
+  await fbDelete(`ucdata/transfers/${id}`);
+  closeModal();showToast('🗑️ রেকর্ড মুছে ফেলা হয়েছে');
 }
 
 async function addMember() {
@@ -1084,7 +1185,7 @@ function memTab(name,el) {
   document.querySelectorAll('#page-members .tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   ['profile','transfer','add','exit'].forEach(n=>document.getElementById('mem-'+n+'-panel').style.display=n===name?'block':'none');
-  if(name==='exit') showExitPreview();
+  if(name==='exit'){showExitPreview();renderExitedMembers();}
   if(name==='transfer') renderTransferHistory();
 }
 
@@ -1122,7 +1223,14 @@ async function deleteMember(id) {
   const d=loadData();
   const m=d.members.find(x=>x.id===id);
   if(!m) return;
-  if(!confirm(`"${m.name}" কে মুছে ফেলবেন?`)) return;
+  // Check if member has any deposits
+  const hasDeposits=d.deposits.some(dep=>dep.memberId===id);
+  if(hasDeposits){
+    showToast('❌ জমা আছে — শুধু নাম এডিট করা যাবে');
+    closeModal();
+    return;
+  }
+  if(!confirm(`"${m.name}" কে মুছে ফেলবেন?\nকোনো জমা নেই, নিরাপদ।`)) return;
   await fbDelete(`ucdata/members/${id}`);
   selectedMemberId=null;
   closeModal();showToast('🗑️ সদস্য মুছে ফেলা হয়েছে');
@@ -1151,8 +1259,69 @@ async function processMemberExit() {
   const id=document.getElementById('exit-member').value;
   const m=d.members.find(x=>x.id===id);
   if(!m||!confirm(m.name+'-কে Exit করাতে চান?')) return;
-  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{status:'Exited'});
+  const exitDate=new Date().toISOString().slice(0,10);
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{status:'Exited',exitDate});
   showToast('✅ Exit সম্পন্ন');
+  renderExitedMembers();
+}
+
+function renderExitedMembers() {
+  const d=loadData();
+  const el=document.getElementById('exited-members-list');
+  if(!el) return;
+  const exited=d.members.filter(m=>m.status==='Exited');
+  if(!exited.length){el.innerHTML='<div class="empty"><div class="e-icon">🚪</div>কোনো সদস্য exit করেননি</div>';return;}
+  el.innerHTML=exited.map(m=>`
+    <div class="list-item">
+      <div class="list-header">
+        <div class="list-name">${m.name}</div>
+        <div class="badge" style="background:var(--red-dim);color:var(--red);">Exit</div>
+      </div>
+      <div class="list-row"><span>যোগদান</span><span>${m.joinDate}</span></div>
+      <div class="list-row"><span>Exit তারিখ</span><span>${m.exitDate||'—'}</span></div>
+      ${currentRole==='editor'?`<div class="action-row">
+        <button class="btn-edit" onclick="editExitedMember('${m.id}')">✏️ এডিট</button>
+        <button class="btn-complete" onclick="reactivateMember('${m.id}')">↩️ ফিরিয়ে আনুন</button>
+      </div>`:''}
+    </div>`).join('');
+}
+
+function editExitedMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  if(!m) return;
+  document.getElementById('edit-modal-title').textContent='Exit সদস্য এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নাম</label><input type="text" id="e-exit-name" value="${m.name}"></div>
+    <div class="form-group"><label>Exit তারিখ</label><input type="date" id="e-exit-date" value="${m.exitDate||''}"></div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-gold" onclick="saveEditExitedMember('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteExitedMember('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditExitedMember(id) {
+  const name=document.getElementById('e-exit-name').value.trim();
+  const exitDate=document.getElementById('e-exit-date').value;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{name,exitDate});
+  closeModal();showToast('✅ আপডেট হয়েছে!');
+}
+
+async function deleteExitedMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  const hasDeposits=d.deposits.some(dep=>dep.memberId===id);
+  if(hasDeposits){showToast('❌ জমা আছে — মুছা যাবে না');closeModal();return;}
+  if(!confirm(`"${m.name}" কে সম্পূর্ণ মুছবেন?`)) return;
+  await fbDelete(`ucdata/members/${id}`);
+  closeModal();showToast('🗑️ মুছে ফেলা হয়েছে');
+}
+
+async function reactivateMember(id) {
+  if(!confirm('এই সদস্যকে আবার সক্রিয় করবেন?')) return;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{status:'Active',exitDate:null});
+  showToast('✅ সদস্য আবার সক্রিয় হয়েছে!');
 }
 
 // ══════════════════════════════
