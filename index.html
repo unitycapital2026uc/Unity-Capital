@@ -229,6 +229,10 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro
         <div class="sec-head">⚙️ মালিকানা বিভাজন</div>
         <div id="ownership-list"></div>
       </div>
+      <div class="card" id="upcoming-inst-card" style="display:none;">
+        <div class="sec-head" style="color:var(--gold);">🔔 আসন্ন কিস্তি</div>
+        <div id="upcoming-inst-list"></div>
+      </div>
     </div>
 
     <!-- DEPOSIT -->
@@ -262,31 +266,71 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro
     <div id="page-investment" class="page">
       <div class="tabs">
         <div class="tab active" onclick="invTab('list',this)">📋 তালিকা</div>
+        <div class="tab" onclick="invTab('schedule',this)">📅 কিস্তি</div>
         <div class="tab" onclick="invTab('add',this)">➕ নতুন</div>
-        <div class="tab" onclick="invTab('recovery',this)">🔄 রিকভারি</div>
+        <div class="tab" onclick="invTab('recovery',this)">🔄 আদায়</div>
       </div>
       <div id="inv-list-panel"><div id="inv-list-content"></div></div>
+      <div id="inv-schedule-panel" style="display:none;"><div id="inv-schedule-content"></div></div>
+      <div id="inv-schedule-panel" style="display:none;"><div id="inv-schedule-content"></div></div>
       <div id="inv-add-panel" style="display:none;">
         <div class="card">
           <div class="form-group"><label>প্রকল্পের নাম</label><input type="text" id="inv-name" placeholder="প্রকল্পের নাম"></div>
           <div class="form-row">
             <div class="form-group"><label>তারিখ</label><input type="date" id="inv-date"></div>
-            <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="inv-amount" placeholder="০"></div>
+            <div class="form-group"><label>মোট বিনিয়োগ (৳)</label><input type="number" id="inv-amount" placeholder="০" oninput="calcInstallmentPlan()"></div>
           </div>
+          
+          <!-- Advance -->
+          <div style="background:var(--navy3);border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">💰 অগ্রিম জমা (ঐচ্ছিক)</div>
+            <div class="form-row">
+              <div class="form-group"><label>অগ্রিম পরিমাণ (৳)</label><input type="number" id="inv-advance" placeholder="০" oninput="calcInstallmentPlan()"></div>
+              <div class="form-group"><label>অগ্রিম তারিখ</label><input type="date" id="inv-advance-date"></div>
+            </div>
+          </div>
+          
+          <!-- Installment Plan -->
+          <div style="background:var(--navy3);border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">📅 কিস্তি পরিকল্পনা</div>
+            <div class="form-row">
+              <div class="form-group"><label>কিস্তি সংখ্যা</label><input type="number" id="inv-installment-count" placeholder="১২" oninput="calcInstallmentPlan()"></div>
+              <div class="form-group"><label>প্রথম কিস্তির তারিখ</label><input type="date" id="inv-first-date" oninput="calcInstallmentPlan()"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>কিস্তির ধরন</label>
+                <select id="inv-installment-type" onchange="calcInstallmentPlan()">
+                  <option value="monthly">মাসিক</option>
+                  <option value="weekly">সাপ্তাহিক</option>
+                  <option value="custom">কাস্টম</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>প্রতি কিস্তি (৳) <span style="color:var(--text2);font-size:10px;">এডিট করুন</span></label>
+                <input type="number" id="inv-installment-amt" placeholder="Auto" oninput="updateLastInstallment()">
+              </div>
+            </div>
+            <div id="installment-preview" style="margin-top:8px;"></div>
+          </div>
+          
           <div class="form-group"><label>নোট</label><textarea id="inv-note" placeholder="বিবরণ..."></textarea></div>
           <button class="btn btn-gold" onclick="saveInvestment()">✅ বিনিয়োগ যোগ করুন</button>
         </div>
       </div>
       <div id="inv-recovery-panel" style="display:none;">
         <div class="card">
-          <div class="form-group"><label>বিনিয়োগ</label><select id="rec-inv"></select></div>
-          <div class="form-group"><label>তারিখ</label><input type="date" id="rec-date"></div>
-          <div class="form-row">
-            <div class="form-group"><label>মূল অংশ (৳)</label><input type="number" id="rec-principal" placeholder="০" oninput="checkRecovery()"></div>
-            <div class="form-group"><label>লাভের অংশ (৳)</label><input type="number" id="rec-profit" placeholder="০" oninput="checkRecovery()"></div>
+          <div class="form-group"><label>বিনিয়োগ বেছে নিন</label><select id="rec-inv" onchange="loadInstallmentList()"></select></div>
+          <div id="rec-installment-section" style="display:none;">
+            <div class="form-group"><label>কিস্তি বেছে নিন</label><select id="rec-installment-sel" onchange="onInstallmentSelect()"></select></div>
           </div>
-          <div id="rec-check" style="margin-bottom:11px;"></div>
-          <button class="btn btn-gold" onclick="saveRecovery()">✅ রিকভারি সেভ করুন</button>
+          <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="rec-date"></div>
+          <div class="form-group">
+            <label>আদায়ের পরিমাণ (৳)</label>
+            <input type="number" id="rec-amount" placeholder="০" oninput="calcRecoveryBreakdown()">
+          </div>
+          <div id="rec-breakdown" style="margin-bottom:11px;"></div>
+          <button class="btn btn-gold" onclick="saveRecovery()">✅ আদায় সেভ করুন</button>
         </div>
       </div>
     </div>
@@ -350,7 +394,10 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro
       </div>
       <div id="mem-add-panel" style="display:none;">
         <div class="card">
-          <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="new-mem-name" placeholder="পূর্ণ নাম"></div>
+          <div class="form-row">
+            <div class="form-group"><label>ইউনিক কোড</label><input type="text" id="new-mem-code" placeholder="UCM01" style="font-family:'IBM Plex Mono',monospace;"></div>
+            <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="new-mem-name" placeholder="পূর্ণ নাম"></div>
+          </div>
           <div class="form-group"><label>যোগদানের তারিখ</label><input type="date" id="new-mem-date"></div>
           <button class="btn btn-gold" onclick="addMember()">✅ সদস্য যোগ করুন</button>
           <p style="font-size:10px;color:var(--text2);margin-top:8px;text-align:center;">নতুন সদস্য যোগে সবার ownership % পুনর্গণনা হবে</p>
@@ -573,11 +620,25 @@ function calcStats() {
   
   const totalPrincipal=d.deposits.reduce((s,x)=>s+(x.principal||0),0);
   const totalPenalty=d.deposits.reduce((s,x)=>s+(x.latePenalty||0)+(x.duePenalty||0),0);
-  const totalInvested=d.investments.filter(i=>i.status==='Running').reduce((s,i)=>s+i.amount,0);
+  
+  // Total invested in running investments
+  const totalInvestedAmount=d.investments.filter(i=>i.status==='Running').reduce((s,i)=>s+i.amount,0);
+  
+  // Total recovered principal from ALL investments (running + completed)
+  const totalRecoveredPrincipal=d.recoveries.reduce((s,r)=>s+(r.principal||0),0);
+  // Also include advances
+  const totalAdvance=d.investments.reduce((s,i)=>s+(i.advanceAmount||0),0);
+  const totalAdvanceRecovered=d.investments.reduce((s,i)=>s+(i.advanceRecovered?i.advanceAmount||0:0),0);
+  
+  // Active investment = what's still locked up
+  // = total invested - recovered principal - recovered advance
+  const totalReturnedPrincipal=totalRecoveredPrincipal+totalAdvanceRecovered;
+  const totalInvested=Math.max(0, totalInvestedAmount - totalReturnedPrincipal);
+  
   const totalProfit=d.recoveries.reduce((s,r)=>s+(r.profit||0),0);
   const totalLoss=d.investments.reduce((s,i)=>s+(i.loss||0),0);
   const totalExpenses=d.expenses.reduce((s,e)=>s+(e.amount||0),0);
-  const totalAssets=totalPrincipal+totalPenalty+totalProfit-totalLoss-totalExpenses;
+  const totalAssets=totalPrincipal+totalPenalty+totalProfit+totalReturnedPrincipal-totalLoss-totalExpenses;
   const cashBalance=totalAssets-totalInvested;
   
   // Ownership: based on principal + extra shares (from transfers)
@@ -644,10 +705,56 @@ function renderDashboard() {
   const ol=document.getElementById('ownership-list');
   ol.innerHTML=s.activeMem.map(m=>{
     const pct=s.ownership[m.id]||0;
-    return `<div class="own-item"><div class="own-name">${m.name}</div><div class="own-bar-wrap"><div class="own-bar" style="width:${pct*100}%"></div></div><div class="own-pct">${fmtPct(pct)}</div></div>`;
+    const label=m.ucCode?`${m.ucCode} · ${m.name}`:m.name;
+    return `<div class="own-item"><div class="own-name" title="${label}">${label}</div><div class="own-bar-wrap"><div class="own-bar" style="width:${pct*100}%"></div></div><div class="own-pct">${fmtPct(pct)}</div></div>`;
   }).join('')||'<div style="color:var(--text2);font-size:12px;">কোনো সদস্য নেই</div>';
   const now=new Date();
   document.getElementById('header-sub').textContent='আপডেট: '+now.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'});
+  renderUpcomingInstallments();
+}
+
+function renderUpcomingInstallments() {
+  const d=loadData();
+  const el=document.getElementById('upcoming-installments-list');
+  if(!el) return;
+  
+  const today=new Date(); today.setHours(0,0,0,0);
+  const items=[];
+  
+  d.investments.forEach(inv=>{
+    if(!inv.installments) return;
+    inv.installments.forEach(inst=>{
+      if(inst.status==='paid') return;
+      const nd=new Date(inst.expectedDate); nd.setHours(0,0,0,0);
+      const diff=Math.round((nd-today)/(1000*60*60*24));
+      if(diff<=14) { // Show next 14 days + overdue
+        items.push({inv,inst,diff});
+      }
+    });
+  });
+  
+  items.sort((a,b)=>a.diff-b.diff);
+  
+  if(!items.length) {
+    el.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center;padding:8px;">কোনো আসন্ন কিস্তি নেই ✅</div>';
+    return;
+  }
+  
+  el.innerHTML=items.map(({inv,inst,diff})=>{
+    const isOverdue=diff<0;
+    const isToday=diff===0;
+    const color=isOverdue?'var(--red)':isToday?'var(--orange)':diff<=7?'var(--orange)':'var(--text2)';
+    const icon=isOverdue?'⚠️':isToday?'🔴':'🔔';
+    const diffText=isOverdue?`${Math.abs(diff)} দিন বকেয়া`:isToday?'আজ':`${diff} দিন পরে`;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:12px;font-weight:700;">${icon} ${inv.name}</div>
+        <div style="font-size:11px;color:${color};">${inst.num} নং কিস্তি · ${diffText}</div>
+        <div style="font-size:10px;color:var(--text2);">${inst.expectedDate}</div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:${color};">${fmt(inst.amount)}</div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════
@@ -656,7 +763,7 @@ function renderDashboard() {
 function renderDepositPage() {
   const d=loadData();
   const sel=document.getElementById('dep-member');
-  sel.innerHTML=d.members.filter(m=>m.status==='Active').map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  sel.innerHTML=d.members.filter(m=>m.status==='Active').map(m=>`<option value="${m.id}">${m.ucCode?m.ucCode+' · ':''} ${m.name}</option>`).join('');
   const now=new Date();
   document.getElementById('dep-month').value=now.toISOString().slice(0,7);
   document.getElementById('dep-date').value=now.toISOString().slice(0,10);
@@ -695,7 +802,7 @@ function renderRecentDeposits() {
   const el=document.getElementById('recent-deposits');
   if(!el) return;
   const recent=[...d.deposits].sort((a,b)=>b.createdAt>a.createdAt?1:-1).slice(0,20);
-  const mm={};d.members.forEach(m=>mm[m.id]=m.name);
+  const mm={};d.members.forEach(m=>mm[m.id]=(m.ucCode?m.ucCode+' · ':'')+m.name);
   if(!recent.length){el.innerHTML='<div class="empty"><div class="e-icon">💳</div>কোনো জমা নেই</div>';return;}
   el.innerHTML=recent.map(dep=>`
     <div class="list-item">
@@ -712,7 +819,7 @@ function editDeposit(id) {
   const d=loadData();
   const dep=d.deposits.find(x=>x.id===id);
   if(!dep) return;
-  const mm={};d.members.forEach(m=>mm[m.id]=m.name);
+  const mm={};d.members.forEach(m=>mm[m.id]=(m.ucCode?m.ucCode+' · ':'')+m.name);
   document.getElementById('edit-modal-title').textContent='জমা এডিট';
   document.getElementById('edit-modal-body').innerHTML=`
     <div class="form-group"><label>সদস্য</label><input value="${mm[dep.memberId]}" disabled style="opacity:.6;"></div>
@@ -755,9 +862,36 @@ async function deleteDeposit(id) {
 function invTab(name,el) {
   document.querySelectorAll('#page-investment .tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['list','add','recovery'].forEach(n=>document.getElementById('inv-'+n+'-panel').style.display=n===name?'block':'none');
+  ['list','schedule','add','recovery'].forEach(n=>{
+    const panel=document.getElementById('inv-'+n+'-panel');
+    if(panel) panel.style.display=n===name?'block':'none';
+  });
   if(name==='list') renderInvestmentList();
-  if(name==='recovery') populateRecoveryDropdown();
+  if(name==='schedule') renderInstallmentSchedule();
+  if(name==='recovery') { populateRecoveryDropdown(); populateAdvanceDropdown(); populateHistoryDropdown(); }
+}
+
+function recTab(name,el) {
+  document.querySelectorAll('#inv-recovery-panel .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['installment','advance','history'].forEach(n=>{
+    const panel=document.getElementById('rec-'+n+'-panel');
+    if(panel) panel.style.display=n===name?'block':'none';
+  });
+  if(name==='history') renderRecoveryHistory();
+}
+
+function getInstallmentStatus(inv) {
+  if(!inv.installments||!inv.installments.length) return null;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const pending=inv.installments.filter(i=>i.status==='pending');
+  const overdue=pending.filter(i=>new Date(i.expectedDate)<today);
+  const upcoming=pending.filter(i=>{
+    const d=new Date(i.expectedDate); d.setHours(0,0,0,0);
+    const diff=(d-today)/(1000*60*60*24);
+    return diff>=0 && diff<=7;
+  });
+  return {total:inv.installments.length, paid:inv.installments.filter(i=>i.status==='paid').length, overdue:overdue.length, upcoming:upcoming.length, next:pending[0]||null};
 }
 
 function renderInvestmentList() {
@@ -765,23 +899,139 @@ function renderInvestmentList() {
   const el=document.getElementById('inv-list-content');
   if(!el) return;
   if(!d.investments.length){el.innerHTML='<div class="empty"><div class="e-icon">📈</div>কোনো বিনিয়োগ নেই</div>';return;}
+  
   const recMap={};
   d.recoveries.forEach(r=>{if(!recMap[r.invId])recMap[r.invId]={principal:0,profit:0};recMap[r.invId].principal+=r.principal||0;recMap[r.invId].profit+=r.profit||0;});
-  el.innerHTML=[...d.investments].sort((a,b)=>b.createdAt>a.createdAt?1:-1).map(inv=>{
+  
+  // Sort: overdue first, then upcoming, then others
+  const sorted=[...d.investments].sort((a,b)=>{
+    const sa=getInstallmentStatus(a), sb=getInstallmentStatus(b);
+    if(sa&&sa.overdue>0 && !(sb&&sb.overdue>0)) return -1;
+    if(sb&&sb.overdue>0 && !(sa&&sa.overdue>0)) return 1;
+    if(sa&&sa.upcoming>0 && !(sb&&sb.upcoming>0)) return -1;
+    if(sb&&sb.upcoming>0 && !(sa&&sa.upcoming>0)) return 1;
+    return b.createdAt>a.createdAt?1:-1;
+  });
+  
+  el.innerHTML=sorted.map(inv=>{
     const rec=recMap[inv.id]||{principal:0,profit:0};
+    const ist=getInstallmentStatus(inv);
+    const totalRecovered=rec.principal+(inv.advanceRecovered?inv.advanceAmount||0:0);
+    const stillLocked=Math.max(0,inv.amount-totalRecovered);
+    
+    let installmentBadge='';
+    if(ist) {
+      if(ist.overdue>0) installmentBadge=`<span style="background:var(--red-dim);color:var(--red);font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px;">⚠️ ${ist.overdue}টি বকেয়া</span>`;
+      else if(ist.upcoming>0) installmentBadge=`<span style="background:var(--orange-dim);color:var(--orange);font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px;">🔔 আসছে</span>`;
+    }
+    
+    let nextInstallment='';
+    if(ist&&ist.next) {
+      const today=new Date(); today.setHours(0,0,0,0);
+      const nd=new Date(ist.next.expectedDate); nd.setHours(0,0,0,0);
+      const diff=Math.round((nd-today)/(1000*60*60*24));
+      const diffText=diff<0?`${Math.abs(diff)} দিন আগে`:diff===0?'আজ':`${diff} দিন পরে`;
+      const color=diff<0?'var(--red)':diff<=7?'var(--orange)':'var(--text2)';
+      nextInstallment=`<div style="font-size:11px;color:${color};margin-top:4px;">পরবর্তী কিস্তি: ${ist.next.expectedDate} (${diffText}) — ${fmt(ist.next.amount)}</div>`;
+    }
+    
     return `<div class="list-item">
-      <div class="list-header"><div class="list-name">${inv.name}</div><div class="badge ${inv.status==='Running'?'badge-running':'badge-completed'}">${inv.status==='Running'?'চলমান':'সমাপ্ত'}</div></div>
-      <div class="list-row"><span>বিনিয়োগ</span><span>${fmt(inv.amount)}</span></div>
-      <div class="list-row"><span>ফেরত মূল</span><span>${fmt(rec.principal)}</span></div>
-      ${rec.profit>0?`<div class="profit-row"><span>লাভ</span><span class="pv">${fmt(rec.profit)}</span></div>`:''}
-      <div class="list-row" style="font-size:10px;margin-top:4px;"><span>তারিখ</span><span>${inv.date}</span></div>
+      <div class="list-header">
+        <div><div class="list-name">${inv.name}${installmentBadge}</div></div>
+        <div class="badge ${inv.status==='Running'?'badge-running':'badge-completed'}">${inv.status==='Running'?'চলমান':'সমাপ্ত'}</div>
+      </div>
+      ${inv.advanceAmount>0?`<div class="list-row"><span>অগ্রিম জমা</span><span style="color:var(--gold);">${fmt(inv.advanceAmount)}</span></div>`:''}
+      <div class="list-row"><span>মোট বিনিয়োগ</span><span>${fmt(inv.amount)}</span></div>
+      <div class="list-row"><span>মোট আদায়</span><span style="color:var(--green);">${fmt(totalRecovered)}</span></div>
+      <div class="list-row"><span>এখনো বাকি</span><span style="color:var(--red);">${fmt(stillLocked)}</span></div>
+      ${rec.profit>0?`<div class="profit-row"><span>মোট লাভ</span><span class="pv">${fmt(rec.profit)}</span></div>`:''}
+      ${ist?`<div style="font-size:11px;color:var(--text2);margin-top:4px;">কিস্তি: ${ist.paid}/${ist.total} আদায়</div>`:''}
+      ${nextInstallment}
       ${currentRole==='editor'?`<div class="action-row">
         <button class="btn-edit" onclick="editInvestment('${inv.id}')">✏️ এডিট</button>
+        <button class="btn-edit" onclick="showInstallmentSchedule('${inv.id}')" style="background:var(--blue-dim);border-color:var(--blue);color:var(--blue);">📅 কিস্তি</button>
         ${inv.status==='Running'?`<button class="btn-complete" onclick="markCompleted('${inv.id}')">✅ সমাপ্ত</button>`:''}
         <button class="btn-del" onclick="deleteInvestment('${inv.id}')">🗑️</button>
       </div>`:''}
     </div>`;
   }).join('');
+}
+
+function showInstallmentSchedule(invId) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments||!inv.installments.length) {showToast('এই বিনিয়োগে কিস্তি নেই'); return;}
+  
+  const today=new Date(); today.setHours(0,0,0,0);
+  document.getElementById('edit-modal-title').textContent=`${inv.name} — কিস্তি তালিকা`;
+  
+  let rows='';
+  if(inv.advanceAmount>0) {
+    rows+=`<div style="background:var(--gold-dim);border:1px solid var(--gold);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div><div style="font-size:12px;font-weight:700;color:var(--gold);">💰 অগ্রিম জমা</div><div style="font-size:11px;color:var(--text2);">${inv.advanceDate||'—'}</div></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--gold);">${fmt(inv.advanceAmount)} ✅</div>
+    </div>`;
+  }
+  
+  inv.installments.forEach(inst=>{
+    const nd=new Date(inst.expectedDate); nd.setHours(0,0,0,0);
+    const isOverdue=inst.status==='pending' && nd<today;
+    const isUpcoming=inst.status==='pending' && (nd-today)/(1000*60*60*24)<=7 && nd>=today;
+    const bg=inst.status==='paid'?'var(--green-dim)':isOverdue?'var(--red-dim)':isUpcoming?'var(--orange-dim)':'var(--navy3)';
+    const borderColor=inst.status==='paid'?'rgba(46,204,113,0.3)':isOverdue?'rgba(231,76,60,0.3)':isUpcoming?'rgba(230,126,34,0.3)':'var(--border)';
+    const statusIcon=inst.status==='paid'?'✅':isOverdue?'⚠️':isUpcoming?'🔔':'⏳';
+    
+    rows+=`<div style="background:${bg};border:1px solid ${borderColor};border-radius:8px;padding:10px 12px;margin-bottom:7px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:12px;font-weight:700;">${statusIcon} ${inst.num} নং কিস্তি</div>
+          <div style="font-size:11px;color:var(--text2);">Expected: ${inst.expectedDate}</div>
+          ${inst.paidDate?`<div style="font-size:11px;color:var(--green);">আদায়: ${inst.paidDate} — ${fmt(inst.paidAmount)}</div>`:''}
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;">${fmt(inst.amount)}</div>
+          ${inst.status==='pending'&&currentRole==='editor'?`<button onclick="quickPayInstallment('${invId}',${inst.num-1})" style="margin-top:4px;padding:4px 10px;background:var(--gold);color:var(--navy);border:none;border-radius:6px;font-size:11px;cursor:pointer;">আদায় করুন</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  
+  document.getElementById('edit-modal-body').innerHTML=rows+`<button class="btn btn-gold" onclick="closeModal()" style="margin-top:8px;">বন্ধ করুন</button>`;
+  openModal();
+}
+
+async function quickPayInstallment(invId, instIdx) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv) return;
+  const inst=inv.installments[instIdx];
+  const today=new Date().toISOString().slice(0,10);
+  const amount=inst.amount;
+  
+  // Calculate if this is principal or profit
+  const totalInvested=inv.amount;
+  const alreadyRecovered=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.principal||0),0)+(inv.advanceRecovered?inv.advanceAmount||0:0);
+  const isPrincipal=alreadyRecovered<totalInvested;
+  const principalPart=isPrincipal?Math.min(amount,totalInvested-alreadyRecovered):0;
+  const profitPart=amount-principalPart;
+  
+  // Save recovery
+  const recId='rec_'+Date.now();
+  await fbWrite(`ucdata/recoveries/${recId}`,{id:recId,invId,date:today,principal:principalPart,profit:profitPart,installmentNum:inst.num,createdAt:new Date().toISOString()});
+  
+  // Update installment status
+  const updatedInstallments=[...inv.installments];
+  updatedInstallments[instIdx]={...inst,status:'paid',paidDate:today,paidAmount:amount};
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInstallments});
+  
+  // Check if fully recovered
+  const newTotalRec=alreadyRecovered+principalPart;
+  if(newTotalRec>=totalInvested && updatedInstallments.every(i=>i.status==='paid')) {
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{status:'Completed'});
+  }
+  
+  closeModal();
+  showToast(`✅ ${inst.num} নং কিস্তি আদায় — মূল: ${fmt(principalPart)}, লাভ: ${fmt(profitPart)}`);
 }
 
 function editInvestment(id) {
@@ -819,20 +1069,100 @@ async function deleteInvestment(id) {
   closeModal();showToast('🗑️ মুছে ফেলা হয়েছে');
 }
 
+// ── Installment Planning ──
+function calcInstallmentPlan() {
+  const amount = parseFloat(document.getElementById('inv-amount').value)||0;
+  const advance = parseFloat(document.getElementById('inv-advance').value)||0;
+  const count = parseInt(document.getElementById('inv-installment-count').value)||0;
+  const firstDate = document.getElementById('inv-first-date').value;
+  const type = document.getElementById('inv-installment-type').value;
+  const preview = document.getElementById('installment-preview');
+  
+  if(!amount || !count || !firstDate) { preview.innerHTML=''; return; }
+  
+  const remaining = amount - advance;
+  const autoAmt = Math.ceil(remaining / count);
+  const lastAmt = remaining - (autoAmt * (count-1));
+  
+  // Set auto amount if not manually set
+  const manualAmt = parseFloat(document.getElementById('inv-installment-amt').value)||0;
+  const installAmt = manualAmt > 0 ? manualAmt : autoAmt;
+  if(!manualAmt) document.getElementById('inv-installment-amt').value = autoAmt;
+  
+  const lastInstallAmt = remaining - (installAmt * (count-1));
+  
+  preview.innerHTML = `
+    <div style="background:var(--navy2);border-radius:8px;padding:10px;font-size:11px;">
+      ${advance>0?`<div style="display:flex;justify-content:space-between;color:var(--gold);margin-bottom:5px;"><span>অগ্রিম জমা</span><span>৳${advance.toLocaleString('en-IN')}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;color:var(--text2);"><span>মোট কিস্তির টাকা</span><span>৳${remaining.toLocaleString('en-IN')}</span></div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2);margin-top:3px;"><span>প্রতি কিস্তি (১-${count-1})</span><span>৳${installAmt.toLocaleString('en-IN')}</span></div>
+      <div style="display:flex;justify-content:space-between;color:var(--orange);margin-top:3px;"><span>শেষ কিস্তি (${count} নং)</span><span>৳${Math.max(0,lastInstallAmt).toLocaleString('en-IN')}</span></div>
+    </div>`;
+}
+
+function updateLastInstallment() { calcInstallmentPlan(); }
+
+function generateInstallmentDates(firstDate, count, type) {
+  const dates = [];
+  let current = new Date(firstDate);
+  for(let i=0;i<count;i++) {
+    dates.push(current.toISOString().slice(0,10));
+    if(type==='monthly') current.setMonth(current.getMonth()+1);
+    else if(type==='weekly') current.setDate(current.getDate()+7);
+    else current.setMonth(current.getMonth()+1); // default monthly
+  }
+  return dates;
+}
+
 async function saveInvestment() {
   if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
   const name=document.getElementById('inv-name').value.trim();
   const date=document.getElementById('inv-date').value;
   const amount=parseFloat(document.getElementById('inv-amount').value)||0;
+  const advance=parseFloat(document.getElementById('inv-advance').value)||0;
+  const advanceDate=document.getElementById('inv-advance-date').value;
+  const installCount=parseInt(document.getElementById('inv-installment-count').value)||0;
+  const firstDate=document.getElementById('inv-first-date').value;
+  const installType=document.getElementById('inv-installment-type').value;
+  const installAmt=parseFloat(document.getElementById('inv-installment-amt').value)||0;
   const note=document.getElementById('inv-note').value;
-  if(!name||!date||!amount){showToast('❌ সব তথ্য দিন');return;}
+  
+  if(!name||!date||!amount){showToast('❌ নাম, তারিখ ও পরিমাণ দিন');return;}
   const s=calcStats();
   if(amount>s.cashBalance){showToast('⚠️ পর্যাপ্ত নগদ নেই!');return;}
+  
   const id='inv_'+Date.now();
-  await fbWrite(`ucdata/investments/${id}`,{id,name,date,amount,loss:0,status:'Running',note,createdAt:new Date().toISOString()});
+  const remaining=amount-advance;
+  const perInstallment=installAmt>0?installAmt:Math.ceil(remaining/(installCount||1));
+  
+  // Generate installment schedule
+  let installments=[];
+  if(installCount>0 && firstDate) {
+    const dates=generateInstallmentDates(firstDate,installCount,installType);
+    for(let i=0;i<installCount;i++) {
+      const isLast=(i===installCount-1);
+      const amt=isLast?Math.max(0,remaining-(perInstallment*(installCount-1))):perInstallment;
+      installments.push({
+        num:i+1, expectedDate:dates[i], amount:amt,
+        status:'pending', paidDate:null, paidAmount:null
+      });
+    }
+  }
+  
+  await fbWrite(`ucdata/investments/${id}`,{
+    id,name,date,amount,
+    advanceAmount:advance,advanceDate:advanceDate||null,advanceRecovered:advance>0,
+    installments,installCount,perInstallment,
+    loss:0,status:'Running',note,
+    createdAt:new Date().toISOString()
+  });
+  
   showToast('✅ বিনিয়োগ যোগ হয়েছে!');
-  ['inv-name','inv-note'].forEach(i=>document.getElementById(i).value='');
+  ['inv-name','inv-note','inv-advance','inv-advance-date','inv-installment-count','inv-first-date','inv-installment-amt'].forEach(i=>{
+    const el=document.getElementById(i); if(el) el.value='';
+  });
   ['inv-date','inv-amount'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('installment-preview').innerHTML='';
 }
 
 async function markCompleted(id) {
@@ -846,33 +1176,108 @@ function populateRecoveryDropdown() {
   const running=d.investments.filter(i=>i.status==='Running');
   sel.innerHTML=running.length?running.map(i=>`<option value="${i.id}">${i.name} (${fmt(i.amount)})</option>`):'<option>চলমান বিনিয়োগ নেই</option>';
   document.getElementById('rec-date').value=new Date().toISOString().slice(0,10);
+  if(running.length) loadInstallmentList();
 }
 
-function checkRecovery() {
-  const p=parseFloat(document.getElementById('rec-principal').value)||0;
-  const pr=parseFloat(document.getElementById('rec-profit').value)||0;
-  document.getElementById('rec-check').innerHTML=`<div class="total-box"><span>মোট:</span><span>${fmt(p+pr)}</span></div>`;
+function loadInstallmentList() {
+  const d=loadData();
+  const invId=document.getElementById('rec-inv').value;
+  const inv=d.investments.find(i=>i.id===invId);
+  const section=document.getElementById('rec-installment-section');
+  const sel=document.getElementById('rec-installment-sel');
+  
+  if(!inv||!inv.installments||!inv.installments.length) {
+    section.style.display='none'; return;
+  }
+  section.style.display='block';
+  
+  const today=new Date(); today.setHours(0,0,0,0);
+  const pending=inv.installments.filter(i=>i.status==='pending');
+  
+  sel.innerHTML='<option value="">-- কিস্তি বেছে নিন --</option>'+
+    pending.map(i=>{
+      const nd=new Date(i.expectedDate); nd.setHours(0,0,0,0);
+      const isOverdue=nd<today;
+      const icon=isOverdue?'⚠️':'⏳';
+      return `<option value="${i.num-1}">${icon} ${i.num} নং কিস্তি — ${i.expectedDate} — ${fmt(i.amount)}</option>`;
+    }).join('');
 }
+
+function onInstallmentSelect() {
+  const d=loadData();
+  const invId=document.getElementById('rec-inv').value;
+  const inv=d.investments.find(i=>i.id===invId);
+  const idx=document.getElementById('rec-installment-sel').value;
+  if(!inv||idx==='') return;
+  const inst=inv.installments[parseInt(idx)];
+  document.getElementById('rec-amount').value=inst.amount;
+  calcRecoveryBreakdown();
+}
+
+function calcRecoveryBreakdown() {
+  const d=loadData();
+  const invId=document.getElementById('rec-inv').value;
+  const inv=d.investments.find(i=>i.id===invId);
+  const amount=parseFloat(document.getElementById('rec-amount').value)||0;
+  if(!inv||!amount) {document.getElementById('rec-breakdown').innerHTML='';return;}
+  
+  const alreadyRecovered=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.principal||0),0)+(inv.advanceRecovered?inv.advanceAmount||0:0);
+  const principalPart=Math.min(amount,Math.max(0,inv.amount-alreadyRecovered));
+  const profitPart=amount-principalPart;
+  
+  document.getElementById('rec-breakdown').innerHTML=`
+    <div class="card" style="background:var(--navy3);">
+      <div class="list-row"><span>মোট বিনিয়োগ</span><span>${fmt(inv.amount)}</span></div>
+      <div class="list-row"><span>আগে আদায়</span><span>${fmt(alreadyRecovered)}</span></div>
+      <div class="list-row"><span>এই আদায় — মূল অংশ</span><span style="color:var(--blue);">${fmt(principalPart)}</span></div>
+      ${profitPart>0?`<div class="list-row"><span>এই আদায় — লাভ অংশ</span><span style="color:var(--green);">${fmt(profitPart)}</span></div>`:''}
+      <div style="height:1px;background:var(--border);margin:6px 0;"></div>
+      <div class="list-row"><span style="font-weight:700;">নগদে যোগ হবে</span><span style="color:var(--green);font-weight:700;">${fmt(amount)}</span></div>
+    </div>`;
+}
+
+function checkRecovery() { calcRecoveryBreakdown(); }
 
 async function saveRecovery() {
   if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
   const invId=document.getElementById('rec-inv').value;
   const date=document.getElementById('rec-date').value;
-  const principal=parseFloat(document.getElementById('rec-principal').value)||0;
-  const profit=parseFloat(document.getElementById('rec-profit').value)||0;
-  if(!invId||!date){showToast('❌ তথ্য দিন');return;}
-  const id='rec_'+Date.now();
-  await fbWrite(`ucdata/recoveries/${id}`,{id,invId,date,principal,profit,createdAt:new Date().toISOString()});
-  // Check if fully recovered
+  const amount=parseFloat(document.getElementById('rec-amount').value)||0;
+  const instIdx=document.getElementById('rec-installment-sel').value;
+  if(!invId||!date||!amount){showToast('❌ তথ্য দিন');return;}
+  
   const d=loadData();
   const inv=d.investments.find(i=>i.id===invId);
-  if(inv){
-    const totalRec=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+r.principal,0)+principal;
-    if(totalRec>=inv.amount) await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{status:'Completed'});
+  
+  // Calculate principal vs profit
+  const alreadyRecovered=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.principal||0),0)+(inv.advanceRecovered?inv.advanceAmount||0:0);
+  const principalPart=Math.min(amount,Math.max(0,inv.amount-alreadyRecovered));
+  const profitPart=amount-principalPart;
+  
+  const id='rec_'+Date.now();
+  await fbWrite(`ucdata/recoveries/${id}`,{
+    id,invId,date,principal:principalPart,profit:profitPart,
+    totalAmount:amount,installmentNum:instIdx!==''?parseInt(instIdx)+1:null,
+    createdAt:new Date().toISOString()
+  });
+  
+  // Update installment status if selected
+  if(instIdx!=='' && inv.installments && inv.installments.length) {
+    const updatedInstallments=[...inv.installments];
+    updatedInstallments[parseInt(instIdx)]={...updatedInstallments[parseInt(instIdx)],status:'paid',paidDate:date,paidAmount:amount};
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInstallments});
   }
-  showToast('✅ রিকভারি সেভ!');
-  ['rec-principal','rec-profit'].forEach(i=>document.getElementById(i).value='');
-  document.getElementById('rec-check').innerHTML='';
+  
+  // Check if fully recovered
+  const newTotalRec=alreadyRecovered+principalPart;
+  if(newTotalRec>=inv.amount) {
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{status:'Completed'});
+  }
+  
+  showToast(`✅ আদায় সেভ! মূল: ${fmt(principalPart)}, লাভ: ${fmt(profitPart)}`);
+  document.getElementById('rec-amount').value='';
+  document.getElementById('rec-breakdown').innerHTML='';
+  document.getElementById('rec-installment-sel').value='';
 }
 
 // ══════════════════════════════
@@ -949,7 +1354,7 @@ function renderMembersPage() {
   const d=loadData();
   const chips=document.getElementById('member-chips');
   if(chips){
-    chips.innerHTML=d.members.map((m,i)=>`<div class="mem-chip${i===0?' active':''}" onclick="selectMember('${m.id}',this)">${m.name}</div>`).join('');
+    chips.innerHTML=d.members.map((m,i)=>`<div class="mem-chip${i===0?' active':''}" onclick="selectMember('${m.id}',this)"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--gold);display:block;">${m.ucCode||''}</span>${m.name}</div>`).join('');
     if(d.members.length){selectedMemberId=d.members[0].id;renderMemberProfile();}
   }
   // Transfer dropdowns
@@ -1009,6 +1414,7 @@ function renderMemberProfile() {
   document.getElementById('member-profile-content').innerHTML=`
     <div class="card">
       <div style="text-align:center;margin-bottom:13px;">
+        ${m.ucCode?`<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold);opacity:0.7;margin-bottom:3px;">${m.ucCode}</div>`:''}
         <div style="font-size:17px;font-weight:700;color:var(--gold);">${m.name}</div>
         <div style="font-size:11px;color:var(--text2);">যোগদান: ${m.joinDate} · ${m.status==='Active'?'✅ সক্রিয়':'❌ বের হয়েছেন'}</div>
         ${currentRole==='editor'?`<div class="action-row" style="margin-top:10px;justify-content:center;">
@@ -1170,13 +1576,17 @@ async function deleteTransfer(id) {
 
 async function addMember() {
   if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const ucCode=document.getElementById('new-mem-code').value.trim().toUpperCase();
   const name=document.getElementById('new-mem-name').value.trim();
   const date=document.getElementById('new-mem-date').value;
-  if(!name||!date){showToast('❌ নাম ও তারিখ দিন');return;}
-  // Use timestamp for unique ID — no conflict ever
+  if(!ucCode||!name||!date){showToast('❌ কোড, নাম ও তারিখ দিন');return;}
+  // Check duplicate code
+  const d=loadData();
+  if(d.members.some(m=>m.ucCode===ucCode)){showToast('❌ এই কোড আগেই আছে!');return;}
   const id='M_'+Date.now();
-  await fbWrite(`ucdata/members/${id}`,{id,name,joinDate:date,status:'Active',extraShares:0});
+  await fbWrite(`ucdata/members/${id}`,{id,ucCode,name,joinDate:date,status:'Active',extraShares:0});
   showToast('✅ সদস্য যোগ হয়েছে!');
+  document.getElementById('new-mem-code').value='';
   document.getElementById('new-mem-name').value='';
   document.getElementById('new-mem-date').value='';
 }
@@ -1195,7 +1605,10 @@ function editMember(id) {
   if(!m) return;
   document.getElementById('edit-modal-title').textContent='সদস্য এডিট';
   document.getElementById('edit-modal-body').innerHTML=`
-    <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="e-mem-name" value="${m.name}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>ইউনিক কোড</label><input type="text" id="e-mem-code" value="${m.ucCode||''}" style="font-family:'IBM Plex Mono',monospace;" placeholder="UCM01"></div>
+      <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="e-mem-name" value="${m.name}"></div>
+    </div>
     <div class="form-group"><label>যোগদানের তারিখ</label><input type="date" id="e-mem-date" value="${m.joinDate}"></div>
     <div class="form-group"><label>স্ট্যাটাস</label>
       <select id="e-mem-status">
@@ -1211,11 +1624,17 @@ function editMember(id) {
 }
 
 async function saveEditMember(id) {
+  const ucCode=document.getElementById('e-mem-code').value.trim().toUpperCase();
   const name=document.getElementById('e-mem-name').value.trim();
   const joinDate=document.getElementById('e-mem-date').value;
   const status=document.getElementById('e-mem-status').value;
   if(!name){showToast('❌ নাম দিন');return;}
-  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{name,joinDate,status});
+  // Check duplicate code (excluding self)
+  const d=loadData();
+  if(ucCode && d.members.some(m=>m.ucCode===ucCode && m.id!==id)){
+    showToast('❌ এই কোড আগেই আছে!');return;
+  }
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{ucCode,name,joinDate,status});
   closeModal();showToast('✅ সদস্য আপডেট হয়েছে!');
 }
 
@@ -1234,6 +1653,70 @@ async function deleteMember(id) {
   await fbDelete(`ucdata/members/${id}`);
   selectedMemberId=null;
   closeModal();showToast('🗑️ সদস্য মুছে ফেলা হয়েছে');
+}
+
+function renderInstallmentSchedule() {
+  const d=loadData();
+  const el=document.getElementById('inv-schedule-content');
+  if(!el) return;
+  
+  const today=new Date().toISOString().slice(0,10);
+  const allInsts=[];
+  
+  d.investments.filter(i=>i.status==='Running').forEach(inv=>{
+    if(inv.installments && inv.installments.length>0) {
+      const recs=d.recoveries.filter(r=>r.invId===inv.id);
+      const totalRec=recs.reduce((s,r)=>s+(r.principal||0)+(r.advance||0),0);
+      inv.installments.forEach(inst=>{
+        allInsts.push({...inst, invName:inv.name, invId:inv.id, totalRec, invAmount:inv.amount});
+      });
+    }
+  });
+  
+  if(!allInsts.length) {
+    el.innerHTML='<div class="empty"><div class="e-icon">📅</div>কোনো কিস্তি সময়সূচী নেই<br><div style="font-size:11px;margin-top:6px;">বিনিয়োগ যোগ করার সময় কিস্তি সংখ্যা দিন</div></div>';
+    return;
+  }
+  
+  // Sort: overdue > upcoming 7 days > future > paid
+  const overdue=allInsts.filter(i=>i.status==='pending'&&i.dueDate<today);
+  const upcoming=allInsts.filter(i=>{
+    const diff=(new Date(i.dueDate)-new Date())/86400000;
+    return i.status==='pending'&&i.dueDate>=today&&diff<=7;
+  });
+  const future=allInsts.filter(i=>{
+    const diff=(new Date(i.dueDate)-new Date())/86400000;
+    return i.status==='pending'&&i.dueDate>=today&&diff>7;
+  });
+  const paid=allInsts.filter(i=>i.status==='paid');
+  
+  const renderInst=(inst,type)=>{
+    const color=type==='overdue'?'var(--red)':type==='upcoming'?'var(--gold)':type==='paid'?'var(--green)':'var(--blue)';
+    const icon=type==='overdue'?'⚠️':type==='upcoming'?'🔔':type==='paid'?'✅':'⏳';
+    const diff=Math.ceil((new Date(inst.dueDate)-new Date())/86400000);
+    return `<div class="list-item" style="border-left:3px solid ${color};">
+      <div class="list-header">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:${color};">${icon} ${inst.num}নং কিস্তি · ${inst.invName}</div>
+          <div style="font-size:10px;color:var(--text2);">
+            ${inst.dueDate}
+            ${type==='overdue'?` · <span style="color:var(--red);">${Math.abs(diff)} দিন আগে!</span>`:''}
+            ${type==='upcoming'?` · <span style="color:var(--gold);">${diff} দিন বাকি</span>`:''}
+            ${type==='paid'?` · আদায়: ${inst.paidDate}`:''}
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:${color};">${fmt(inst.status==='paid'?inst.paidAmount:inst.amount)}</div>
+      </div>
+    </div>`;
+  };
+  
+  let html='';
+  if(overdue.length) html+=`<div class="sec-head" style="color:var(--red);">⚠️ মেয়াদ পেরিয়েছে (${overdue.length}টি)</div>`+overdue.map(i=>renderInst(i,'overdue')).join('');
+  if(upcoming.length) html+=`<div class="sec-head" style="color:var(--gold);">🔔 আসছে ৭ দিনের মধ্যে (${upcoming.length}টি)</div>`+upcoming.map(i=>renderInst(i,'upcoming')).join('');
+  if(future.length) html+=`<div class="sec-head">⏳ ভবিষ্যৎ কিস্তি (${future.length}টি)</div>`+future.map(i=>renderInst(i,'future')).join('');
+  if(paid.length) html+=`<div class="sec-head" style="color:var(--green);">✅ আদায় হয়েছে (${paid.length}টি)</div>`+paid.map(i=>renderInst(i,'paid')).join('');
+  
+  el.innerHTML=html;
 }
 
 function showExitPreview() {
