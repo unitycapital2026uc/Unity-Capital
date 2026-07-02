@@ -2,286 +2,2578 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Unity Capital</title>
-<meta name="theme-color" content="#0F3D3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f1923">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Unity Capital">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Unity Capital v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F7F4EC;
-  --paper:#FFFFFF;
-  --ink:#12302E;
-  --ink-soft:#4B615F;
-  --teal:#0F3D3E;
-  --teal-2:#175651;
-  --gold:#C89B3C;
-  --gold-soft:#E8D9AF;
-  --red:#B23A3A;
-  --red-bg:#FBEAEA;
-  --orange:#C9772B;
-  --orange-bg:#FCF0DF;
-  --green:#2E7D4F;
-  --green-bg:#E9F5EC;
-  --border:#E4DFCE;
-  --radius:14px;
-  --shadow:0 2px 10px rgba(18,48,46,.06);
+  --navy:#0f1923;--navy2:#162030;--navy3:#1e2d3d;
+  --gold:#c9a84c;--gold2:#e8c46a;--gold-dim:rgba(201,168,76,0.15);
+  --green:#2ecc71;--green-dim:rgba(46,204,113,0.12);
+  --red:#e74c3c;--red-dim:rgba(231,76,60,0.12);
+  --blue:#3498db;--blue-dim:rgba(52,152,219,0.12);
+  --orange:#e67e22;--orange-dim:rgba(230,126,34,0.12);
+  --text:#e8e8e8;--text2:#9ab;--border:rgba(255,255,255,0.07);
+  --radius:16px;--radius-sm:10px;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind Siliguri',sans-serif;}
-h1,h2,h3,.serif{font-family:'Noto Serif Bengali',serif;}
-button,input,select{font-family:inherit;}
-.num{font-variant-numeric:tabular-nums;}
-::-webkit-scrollbar{width:0;height:0;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro Bangla',serif;overflow:hidden;}
 
-/* ---------- LOGIN ---------- */
-#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 20%,var(--teal-2),var(--teal) 65%);color:#fff;padding:24px;}
-.login-badge{width:96px;height:96px;border-radius:50%;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.3);margin-bottom:14px;background:#fff;}
-.login-badge img{width:100%;height:100%;object-fit:cover;}
-#login-screen h1{font-size:24px;margin:0 0 2px;letter-spacing:.5px;}
-#login-screen p{opacity:.75;margin:0 0 26px;font-size:13.5px;}
-.pin-dots{display:flex;gap:14px;margin-bottom:26px;}
-.pin-dots span{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.5);transition:.15s;}
-.pin-dots span.filled{background:var(--gold);border-color:var(--gold);}
-.keypad{display:grid;grid-template-columns:repeat(3,64px);gap:14px;}
-.keypad button{width:64px;height:64px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:20px;font-weight:600;}
-.keypad button:active{background:rgba(255,255,255,.22);}
-.keypad button.ghost{border:none;background:transparent;color:rgba(255,255,255,.6);font-size:14px;}
-#login-error{color:#ffb4b4;font-size:13px;margin-top:14px;min-height:16px;}
+/* PIN */
+#pin-screen{position:fixed;inset:0;background:var(--navy);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;}
+.pin-logo{width:100px;height:100px;border-radius:22px;margin-bottom:14px;object-fit:contain;background:white;padding:6px;box-shadow:0 8px 32px rgba(201,168,76,0.3);}
+.pin-title{font-size:20px;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:3px;}
+.pin-sub{font-size:11px;color:var(--text2);margin-bottom:24px;text-align:center;line-height:1.6;}
+.pin-dots{display:flex;gap:14px;margin-bottom:24px;}
+.pin-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--gold);transition:all .2s;}
+.pin-dot.filled{background:var(--gold);}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:230px;}
+.pin-btn{height:60px;background:var(--navy2);border:1px solid var(--border);border-radius:13px;color:var(--text);font-size:22px;font-family:'IBM Plex Mono',monospace;font-weight:600;cursor:pointer;transition:all .15s;}
+.pin-btn:active{background:var(--gold-dim);border-color:var(--gold);transform:scale(0.94);}
+.pin-error{color:var(--red);font-size:12px;margin-top:10px;min-height:18px;text-align:center;}
+#sync-status{font-size:10px;margin-top:8px;color:var(--text2);}
 
-/* ---------- APP SHELL ---------- */
-#app{display:none;min-height:100vh;flex-direction:column;padding-bottom:70px;}
-.topbar{position:sticky;top:0;z-index:20;background:var(--teal);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
-.topbar .brand{display:flex;align-items:center;gap:9px;}
-.topbar .brand .mark{width:32px;height:32px;border-radius:50%;overflow:hidden;background:#fff;flex-shrink:0;}
-.topbar .brand .mark img{width:100%;height:100%;object-fit:cover;}
-.topbar h1{font-size:16.5px;margin:0;}
-.role-badge{font-size:10.5px;background:rgba(255,255,255,.15);padding:3px 9px;border-radius:20px;margin-left:8px;font-weight:600;}
-.topbar button{background:none;border:none;color:#fff;font-size:19px;opacity:.85;}
+/* LAYOUT */
+#app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;}
+#header{background:var(--navy2);padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;}
+#header img{width:36px;height:36px;border-radius:9px;object-fit:contain;background:white;padding:3px;}
+#header-text h1{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--gold);letter-spacing:1px;}
+#header-text p{font-size:10px;color:var(--text2);margin-top:1px;}
+#header-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+#role-pill{padding:3px 9px;border-radius:20px;font-size:10px;font-family:'IBM Plex Mono',monospace;}
+.pill-viewer{background:var(--blue-dim);color:var(--blue);}
+.pill-editor{background:var(--green-dim);color:var(--green);}
+#lock-btn{background:transparent;border:none;color:var(--text2);font-size:17px;cursor:pointer;padding:3px;}
+#firebase-dot{width:8px;height:8px;border-radius:50%;background:var(--text2);flex-shrink:0;}
+#firebase-dot.connected{background:var(--green);box-shadow:0 0 6px var(--green);}
 
-main{flex:1;padding:16px 14px 24px;max-width:640px;margin:0 auto;width:100%;}
-.page{display:none;animation:fadein .2s ease;}
+#content{flex:1;overflow-y:auto;padding:13px;padding-bottom:78px;}
+#content::-webkit-scrollbar{display:none;}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--navy2);border-top:1px solid var(--border);display:flex;z-index:100;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border:none;background:transparent;color:var(--text2);font-family:'Tiro Bangla',serif;font-size:9px;cursor:pointer;transition:color .2s;}
+.nav-btn .icon{font-size:18px;}
+.nav-btn.active{color:var(--gold);}
+
+/* PAGES */
+.page{display:none;animation:fadeIn .2s ease;}
 .page.active{display:block;}
-@keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
-.card{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow);}
-.card h2,.card h3{margin:0 0 12px;font-size:15.5px;color:var(--teal);}
-.section-title{font-family:'Noto Serif Bengali',serif;font-size:19px;color:var(--teal);margin:4px 0 14px;display:flex;align-items:center;justify-content:space-between;}
+/* CARDS */
+.card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:11px;}
+.sec-head{font-size:11px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--border);margin-top:3px;}
 
-/* dashboard stat grid */
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.stat{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);}
-.stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
-.stat .value{font-size:19px;font-weight:700;color:var(--teal);}
-.stat.wide{grid-column:1/-1;background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;border:none;}
-.stat.wide .label{color:rgba(255,255,255,.75);}
-.stat.wide .value{color:#fff;font-size:26px;}
-.stat.gold .value{color:var(--gold);}
-.stat.red .value{color:var(--red);}
-.stat.green .value{color:var(--green);}
+/* ASSET BANNER */
+.asset-banner{background:linear-gradient(135deg,#1a2f1a,#0f1923);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:16px;margin-bottom:11px;}
+.asset-label{font-size:11px;color:var(--text2);}
+.asset-value{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:var(--green);margin:3px 0;}
+.asset-sub{display:flex;gap:18px;margin-top:7px;}
+.asset-sub-item .lbl{font-size:10px;color:var(--text2);}
+.asset-sub-item .val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);}
 
-.donut-wrap{display:flex;align-items:center;gap:18px;}
-.donut{width:110px;height:110px;border-radius:50%;flex-shrink:0;}
-.legend{flex:1;display:flex;flex-direction:column;gap:7px;}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px;}
-.legend-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.legend-item .pct{margin-left:auto;font-weight:600;}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px;}
+.metric{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px;}
+.metric .m-label{font-size:10px;color:var(--text2);margin-bottom:3px;}
+.metric .m-value{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;}
+.metric.green .m-value{color:var(--green);} .metric.red .m-value{color:var(--red);}
+.metric.gold .m-value{color:var(--gold);} .metric.blue .m-value{color:var(--blue);}
+.metric.orange .m-value{color:var(--orange);}
 
-.list-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);gap:10px;}
-.list-item:last-child{border-bottom:none;}
-.list-item .main{font-weight:600;font-size:14px;}
-.list-item .sub{font-size:12px;color:var(--ink-soft);}
-.list-item .right{text-align:right;}
-.tag{font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600;}
-.tag.overdue{background:var(--red-bg);color:var(--red);}
-.tag.upcoming{background:var(--orange-bg);color:var(--orange);}
-.tag.future{background:var(--bg);color:var(--ink-soft);border:1px solid var(--border);}
-.tag.completed{background:var(--green-bg);color:var(--green);}
-.tag.running{background:var(--gold-soft);color:#7a5b12;}
+/* OWNERSHIP */
+.own-item{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.own-name{width:85px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.own-bar-wrap{flex:1;height:5px;background:var(--navy3);border-radius:3px;overflow:hidden;}
+.own-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width .5s;}
+.own-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);width:42px;text-align:right;}
 
-.row-actions{display:flex;gap:6px;}
-.icon-btn{border:1px solid var(--border);background:var(--paper);border-radius:8px;padding:5px 8px;font-size:13px;}
-.icon-btn.danger{color:var(--red);border-color:#ecc;}
+/* FORMS */
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-size:11px;color:var(--text2);margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 12px;color:var(--text);font-family:'Tiro Bangla',serif;font-size:13px;outline:none;transition:border-color .2s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold);}
+.form-group select option{background:var(--navy2);}
+.form-group textarea{min-height:60px;resize:none;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.btn{width:100%;padding:12px;border:none;border-radius:var(--radius-sm);font-family:'Tiro Bangla',serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+.btn-gold:active{transform:scale(0.97);}
+.btn-red{background:linear-gradient(135deg,#c0392b,#e74c3c);color:white;}
+.btn-blue{background:linear-gradient(135deg,#1a5276,#2980b9);color:white;}
 
-.item-card{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--paper);}
-.item-card.overdue{border-left:4px solid var(--red);}
-.item-card.upcoming{border-left:4px solid var(--orange);}
-.item-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.progress-bar{height:6px;border-radius:6px;background:var(--bg);overflow:hidden;margin:8px 0;}
-.progress-bar .fill{height:100%;background:var(--gold);}
+/* TABS */
+.tabs{display:flex;background:var(--navy3);border-radius:var(--radius-sm);padding:3px;margin-bottom:13px;}
+.tab{flex:1;text-align:center;padding:7px 3px;border-radius:8px;font-size:11px;cursor:pointer;color:var(--text2);transition:all .2s;}
+.tab.active{background:var(--navy2);color:var(--gold);font-weight:700;}
 
-.fab{position:fixed;right:18px;bottom:84px;width:54px;height:54px;border-radius:50%;background:var(--teal);color:#fff;border:none;font-size:26px;box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:15;}
+/* LIST ITEMS */
+.list-item{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:9px;}
+.list-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;}
+.list-name{font-size:13px;font-weight:700;}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-family:'IBM Plex Mono',monospace;}
+.badge-running{background:var(--blue-dim);color:var(--blue);}
+.badge-completed{background:var(--green-dim);color:var(--green);}
+.badge-expense{background:var(--orange-dim);color:var(--orange);}
+.list-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:3px;}
+.list-row span:last-child{font-family:'IBM Plex Mono',monospace;color:var(--text);}
+.action-row{display:flex;gap:7px;margin-top:9px;}
+.btn-edit{flex:1;padding:7px;background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold);border-radius:7px;font-size:11px;cursor:pointer;font-family:'Tiro Bangla',serif;}
+.btn-del{padding:7px 12px;background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:7px;font-size:11px;cursor:pointer;}
+.btn-complete{flex:1;padding:7px;background:var(--green-dim);color:var(--green);border:1px solid var(--green);border-radius:7px;font-size:11px;cursor:pointer;font-family:'Tiro Bangla',serif;}
 
-.tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:4px;}
-.tabs button{flex:1;border:none;background:none;padding:9px 4px;font-size:12.5px;border-radius:9px;color:var(--ink-soft);font-weight:600;}
-.tabs button.active{background:var(--teal);color:#fff;}
+/* MEMBER */
+.member-selector{display:flex;gap:7px;overflow-x:auto;padding-bottom:7px;margin-bottom:13px;}
+.member-selector::-webkit-scrollbar{display:none;}
+.mem-chip{flex-shrink:0;padding:6px 12px;background:var(--navy3);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s;}
+.mem-chip.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);}
+.member-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px;}
+.member-stat{background:var(--navy3);border-radius:var(--radius-sm);padding:11px;text-align:center;}
+.member-stat .ms-val{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;color:var(--gold);}
+.member-stat .ms-lbl{font-size:10px;color:var(--text2);margin-top:2px;}
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.hist-item:last-child{border-bottom:none;}
 
-.form-group{margin-bottom:13px;}
-.form-group label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
-.form-group input,.form-group select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:14.5px;color:var(--ink);}
-.form-group input:focus,.form-group select:focus{outline:2px solid var(--teal);outline-offset:1px;}
-.form-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;animation:fadeIn .2s;}
+.modal{background:var(--navy2);border-radius:20px 20px 0 0;padding:18px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:transparent;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1;}
 
-.btn{display:block;width:100%;padding:13px;border-radius:11px;border:none;font-size:15px;font-weight:700;text-align:center;}
-.btn-primary{background:var(--teal);color:#fff;}
-.btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
-.btn-danger{background:var(--red-bg);color:var(--red);}
-.btn-gold{background:var(--gold);color:var(--teal);}
-
-.empty{text-align:center;padding:34px 10px;color:var(--ink-soft);font-size:13.5px;}
-.empty .emoji{font-size:30px;display:block;margin-bottom:8px;}
-
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--paper);border-top:1px solid var(--border);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom);}
-.bottom-nav button{flex:1;border:none;background:none;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-soft);font-size:10.5px;font-weight:600;}
-.bottom-nav button .ic{font-size:19px;}
-.bottom-nav button.active{color:var(--teal);}
-.bottom-nav button.active .ic{transform:translateY(-1px);}
-
-/* modal */
-#modal-overlay{position:fixed;inset:0;background:rgba(18,48,46,.45);z-index:50;display:none;align-items:flex-end;justify-content:center;}
-#modal-overlay.show{display:flex;}
-#modal{background:var(--paper);width:100%;max-width:640px;max-height:88vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));animation:slideup .22s ease;}
-@keyframes slideup{from{transform:translateY(30px);opacity:0;}to{transform:none;opacity:1;}}
-#modal .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-#modal .modal-head h3{margin:0;color:var(--teal);}
-#modal .modal-head button{border:none;background:var(--bg);width:30px;height:30px;border-radius:50%;font-size:15px;}
-
-.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:60;box-shadow:var(--shadow);opacity:0;transition:.25s;pointer-events:none;}
-.toast.show{opacity:1;top:20px;}
-
-.locked-note{background:var(--orange-bg);color:var(--orange);font-size:12px;padding:9px 12px;border-radius:10px;margin-bottom:12px;}
+/* TOAST */
+#toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy3);border:1px solid var(--gold);color:var(--gold);padding:9px 18px;border-radius:20px;font-size:12px;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:32px 16px;color:var(--text2);font-size:12px;}
+.empty .e-icon{font-size:32px;margin-bottom:8px;}
+.profit-row{display:flex;justify-content:space-between;align-items:center;padding:6px 11px;background:var(--green-dim);border-radius:7px;margin-top:7px;}
+.profit-row span{font-size:11px;color:var(--green);}
+.profit-row .pv{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+.total-box{background:var(--navy3);border-radius:8px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.total-box span:first-child{font-size:12px;color:var(--text2);}
+.total-box span:last-child{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--gold);}
+.share-transfer-item{background:var(--navy3);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.limit-note{font-size:11px;color:var(--orange);margin-top:5px;}
 </style>
 </head>
 <body>
 
-<!-- ================= LOGIN ================= -->
-<div id="login-screen">
-  <div class="login-badge"><img src="icon-192.png" alt="Unity Capital"></div>
-  <h1>Unity Capital</h1>
-  <p>প্রবেশের জন্য ৪ সংখ্যার PIN দিন</p>
-  <div class="pin-dots" id="pinDots">
-    <span></span><span></span><span></span><span></span>
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <img src="data:image/png;base64,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" class="pin-logo" alt="UC">
+  <div class="pin-title">UNITY CAPITAL</div>
+  <div class="pin-sub">একতা • সঞ্চয় • বিনিয়োগ • সমৃদ্ধি<br>PIN দিয়ে প্রবেশ করুন</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
   </div>
-  <div class="keypad" id="keypad">
-    <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
-    <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
-    <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
-    <button class="ghost" data-k="clear">মুছুন</button><button data-k="0">0</button><button class="ghost" data-k="back">⌫</button>
+  <div class="pin-grid">
+    <button class="pin-btn" onclick="pinPress('1')">1</button>
+    <button class="pin-btn" onclick="pinPress('2')">2</button>
+    <button class="pin-btn" onclick="pinPress('3')">3</button>
+    <button class="pin-btn" onclick="pinPress('4')">4</button>
+    <button class="pin-btn" onclick="pinPress('5')">5</button>
+    <button class="pin-btn" onclick="pinPress('6')">6</button>
+    <button class="pin-btn" onclick="pinPress('7')">7</button>
+    <button class="pin-btn" onclick="pinPress('8')">8</button>
+    <button class="pin-btn" onclick="pinPress('9')">9</button>
+    <button class="pin-btn" onclick="pinPress('clr')" style="font-size:13px;">⌫</button>
+    <button class="pin-btn" onclick="pinPress('0')">0</button>
+    <button class="pin-btn" onclick="pinPress('clr')" style="font-size:13px;color:var(--red);">✕</button>
   </div>
-  <div id="login-error"></div>
+  <div class="pin-error" id="pin-error"></div>
+  <div id="sync-status">🔄 Firebase এ সংযুক্ত হচ্ছে...</div>
 </div>
 
-<!-- ================= APP ================= -->
-<div id="app">
-  <div class="topbar">
-    <div class="brand"><div class="mark"><img src="icon-192.png" alt="Unity Capital"></div><h1>Unity Capital<span class="role-badge" id="roleBadge"></span></h1></div>
-    <button id="logoutBtn" title="লগআউট">⏻</button>
+<!-- APP -->
+<div id="app" style="display:none;">
+  <div id="header">
+    <img src="data:image/png;base64,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" alt="UC">
+    <div id="header-text">
+      <h1>UNITY CAPITAL</h1>
+      <p id="header-sub">লোড হচ্ছে...</p>
+    </div>
+    <div id="header-right">
+      <div id="firebase-dot" title="Firebase সংযোগ"></div>
+      <span id="role-pill" class="pill-viewer">VIEWER</span>
+      <button id="lock-btn" onclick="lockApp()">🔒</button>
+    </div>
   </div>
 
-  <main id="pages">
+  <div id="content">
 
     <!-- DASHBOARD -->
-    <section class="page active" id="page-dashboard">
-      <div class="section-title">📊 Dashboard</div>
-      <div class="stat-grid" id="dashStats"></div>
-
+    <div id="page-dashboard" class="page active">
+      <div class="asset-banner">
+        <div class="asset-label">মোট সম্পদ</div>
+        <div class="asset-value" id="d-total-assets">৳০</div>
+        <div class="asset-sub">
+          <div class="asset-sub-item"><div class="lbl">হাতে নগদ</div><div class="val" id="d-cash">৳০</div></div>
+          <div class="asset-sub-item"><div class="lbl">বিনিয়োগে</div><div class="val" id="d-invested">৳০</div></div>
+        </div>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric green"><div class="m-label">মোট মূল জমা</div><div class="m-value" id="d-principal">৳০</div></div>
+        <div class="metric gold"><div class="m-label">মোট জরিমানা</div><div class="m-value" id="d-penalty">৳০</div></div>
+        <div class="metric green"><div class="m-label">মোট লাভ</div><div class="m-value" id="d-profit">৳০</div></div>
+        <div class="metric red"><div class="m-label">লোকসান+খরচ</div><div class="m-value" id="d-loss">৳০</div></div>
+        <div class="metric blue"><div class="m-label">সক্রিয় সদস্য</div><div class="m-value" id="d-members">০</div></div>
+        <div class="metric orange"><div class="m-label">চলমান বিনিয়োগ</div><div class="m-value" id="d-running-inv">০</div></div>
+      </div>
       <div class="card">
-        <h2>মালিকানা বিভাজন</h2>
-        <div class="donut-wrap">
-          <div class="donut" id="ownerDonut"></div>
-          <div class="legend" id="ownerLegend"></div>
+        <div class="sec-head">⚙️ মালিকানা বিভাজন</div>
+        <div id="ownership-list"></div>
+      </div>
+      <div class="card" id="upcoming-inst-card" style="display:none;">
+        <div class="sec-head" style="color:var(--gold);">🔔 আসন্ন কিস্তি</div>
+        <div id="upcoming-inst-list"></div>
+      </div>
+    </div>
+
+    <!-- DEPOSIT -->
+    <div id="page-deposit" class="page">
+      <div class="sec-head">মাসিক চাঁদা এন্ট্রি</div>
+      <div class="card">
+        <div class="form-group"><label>সদস্য</label><select id="dep-member"></select></div>
+        <div class="form-row">
+          <div class="form-group"><label>মাস</label><input type="month" id="dep-month"></div>
+          <div class="form-group"><label>তারিখ</label><input type="date" id="dep-date"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>মূল জমা (৳) সর্বোচ্চ ২০০০</label>
+            <input type="number" id="dep-principal" placeholder="২০০০" max="2000" oninput="calcDepTotal()">
+            <div class="limit-note" id="dep-limit-note"></div>
+          </div>
+          <div class="form-group"><label>জরিমানা (৳)</label><input type="number" id="dep-penalty-amt" placeholder="০" value="0" oninput="calcDepTotal()"></div>
+        </div>
+        <div class="total-box" id="dep-total-box" style="display:none;">
+          <span>মোট জমা:</span><span id="dep-total-preview">৳০</span>
+        </div>
+        <p style="font-size:10px;color:var(--text2);margin-bottom:10px;">⚠️ জরিমানা সম্পদে যোগ হয় কিন্তু মালিকানা % বাড়ায় না</p>
+        <button class="btn btn-gold" onclick="saveDeposit()">✅ জমা সেভ করুন</button>
+      </div>
+      <div class="sec-head">সাম্প্রতিক জমা</div>
+      <div id="recent-deposits"></div>
+    </div>
+
+    <!-- INVESTMENT -->
+    <div id="page-investment" class="page">
+      <div class="tabs">
+        <div class="tab active" onclick="invTab('list',this)">📋 তালিকা</div>
+        <div class="tab" onclick="invTab('schedule',this)">📅 কিস্তি</div>
+        <div class="tab" onclick="invTab('add',this)">➕ নতুন</div>
+        <div class="tab" onclick="invTab('recovery',this)">🔄 আদায়</div>
+      </div>
+      <div id="inv-list-panel"><div id="inv-list-content"></div></div>
+      <div id="inv-schedule-panel" style="display:none;"><div id="inv-schedule-content"></div></div>
+      <div id="inv-schedule-panel" style="display:none;"><div id="inv-schedule-content"></div></div>
+      <div id="inv-add-panel" style="display:none;">
+        <div class="card">
+          <div class="form-group"><label>প্রকল্পের নাম</label><input type="text" id="inv-name" placeholder="প্রকল্পের নাম"></div>
+          <div class="form-row">
+            <div class="form-group"><label>তারিখ</label><input type="date" id="inv-date"></div>
+            <div class="form-group"><label>মোট বিনিয়োগ (৳)</label><input type="number" id="inv-amount" placeholder="০" oninput="calcInstallmentPlan()"></div>
+          </div>
+          
+          <!-- Advance -->
+          <div style="background:var(--navy3);border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">💰 অগ্রিম জমা (ঐচ্ছিক)</div>
+            <div class="form-row">
+              <div class="form-group"><label>অগ্রিম পরিমাণ (৳)</label><input type="number" id="inv-advance" placeholder="০" oninput="calcInstallmentPlan()"></div>
+              <div class="form-group"><label>অগ্রিম তারিখ</label><input type="date" id="inv-advance-date"></div>
+            </div>
+          </div>
+          
+          <!-- Installment Plan -->
+          <div style="background:var(--navy3);border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">📅 কিস্তি পরিকল্পনা</div>
+            <div class="form-row">
+              <div class="form-group"><label>কিস্তি সংখ্যা</label><input type="number" id="inv-installment-count" placeholder="১২" oninput="calcInstallmentPlan()"></div>
+              <div class="form-group"><label>প্রথম কিস্তির তারিখ</label><input type="date" id="inv-first-date" oninput="calcInstallmentPlan()"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>কিস্তির ধরন</label>
+                <select id="inv-installment-type" onchange="calcInstallmentPlan()">
+                  <option value="monthly">মাসিক</option>
+                  <option value="weekly">সাপ্তাহিক</option>
+                  <option value="custom">কাস্টম</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>প্রতি কিস্তি (৳) <span style="color:var(--text2);font-size:10px;">এডিট করুন</span></label>
+                <input type="number" id="inv-installment-amt" placeholder="Auto" oninput="updateLastInstallment()">
+              </div>
+            </div>
+            <div id="installment-preview" style="margin-top:8px;"></div>
+          </div>
+          
+          <div class="form-group"><label>নোট</label><textarea id="inv-note" placeholder="বিবরণ..."></textarea></div>
+          <button class="btn btn-gold" onclick="saveInvestment()">✅ বিনিয়োগ যোগ করুন</button>
+        </div>
+      </div>
+      <div id="inv-recovery-panel" style="display:none;">
+        <div class="card">
+          <div class="form-group"><label>বিনিয়োগ বেছে নিন</label><select id="rec-inv" onchange="loadInstallmentList()"></select></div>
+          <div id="rec-installment-section" style="display:none;">
+            <div class="form-group"><label>কিস্তি বেছে নিন</label><select id="rec-installment-sel" onchange="onInstallmentSelect()"></select></div>
+          </div>
+          <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="rec-date"></div>
+          <div class="form-group">
+            <label>আদায়ের পরিমাণ (৳)</label>
+            <input type="number" id="rec-amount" placeholder="০" oninput="calcRecoveryBreakdown()">
+          </div>
+          <div id="rec-breakdown" style="margin-bottom:11px;"></div>
+          <button class="btn btn-gold" onclick="saveRecovery()">✅ আদায় সেভ করুন</button>
+        </div>
+        <div class="sec-head" style="margin-top:8px;">কিস্তির তালিকা</div>
+        <div id="installment-list-view"></div>
+      </div>
+    </div>
+
+    <!-- EXPENSES -->
+    <div id="page-expenses" class="page">
+      <div class="sec-head">খরচ এন্ট্রি</div>
+      <div class="card">
+        <div class="form-group"><label>তারিখ</label><input type="date" id="exp-date"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ধরন</label>
+            <select id="exp-cat">
+              <option>খাতা/কলম</option>
+              <option>মিটিং খরচ</option>
+              <option>ব্যাংক চার্জ</option>
+              <option>রেজিস্ট্রেশন</option>
+              <option>প্রিন্টিং</option>
+              <option>যাতায়াত</option>
+              <option>অন্যান্য</option>
+            </select>
+          </div>
+          <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="exp-amount" placeholder="০"></div>
+        </div>
+        <div class="form-group"><label>নোট</label><input type="text" id="exp-note" placeholder="বিবরণ..."></div>
+        <button class="btn btn-gold" onclick="saveExpense()">✅ খরচ সেভ করুন</button>
+      </div>
+      <div class="sec-head">খরচের তালিকা</div>
+      <div id="expense-list"></div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div id="page-members" class="page">
+      <div class="tabs">
+        <div class="tab active" onclick="memTab('profile',this)">👤 প্রোফাইল</div>
+        <div class="tab" onclick="memTab('transfer',this)">🔄 শেয়ার</div>
+        <div class="tab" onclick="memTab('add',this)">➕ নতুন</div>
+        <div class="tab" onclick="memTab('exit',this)">🚪 Exit</div>
+      </div>
+      <div id="mem-profile-panel">
+        <div class="member-selector" id="member-chips"></div>
+        <div id="member-profile-content"></div>
+      </div>
+      <div id="mem-transfer-panel" style="display:none;">
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;">🔄 শেয়ার ট্রান্সফার</div>
+          <div class="form-group"><label>বিক্রেতা (যে বেচবে)</label><select id="transfer-from" onchange="previewTransfer()"></select></div>
+          <div id="buyers-list">
+            <div class="form-row" id="buyer-row-0">
+              <div class="form-group"><label>ক্রেতা ১</label><select class="buyer-select" data-idx="0"></select></div>
+              <div class="form-group"><label>% পরিমাণ</label><input type="number" class="buyer-pct" data-idx="0" placeholder="৫" step="0.01" oninput="previewTransfer()"></div>
+            </div>
+          </div>
+          <button onclick="addBuyerRow()" style="width:100%;padding:8px;background:var(--navy3);border:1px solid var(--border);color:var(--text2);border-radius:8px;font-size:12px;cursor:pointer;margin-bottom:12px;">+ আরেকজন ক্রেতা যোগ করুন</button>
+          <div id="transfer-preview" style="margin-bottom:12px;"></div>
+          <button class="btn btn-gold" onclick="doShareTransfer()">✅ শেয়ার ট্রান্সফার করুন</button>
+          <p style="font-size:10px;color:var(--text2);margin-top:8px;text-align:center;">সর্বসম্মত অনুমোদন আবশ্যক</p>
+        </div>
+        <div class="sec-head">ট্রান্সফার ইতিহাস</div>
+        <div id="transfer-history"></div>
+      </div>
+      <div id="mem-add-panel" style="display:none;">
+        <div class="card">
+          <div class="form-row">
+            <div class="form-group"><label>ইউনিক কোড</label><input type="text" id="new-mem-code" placeholder="UCM01" style="font-family:'IBM Plex Mono',monospace;"></div>
+            <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="new-mem-name" placeholder="পূর্ণ নাম"></div>
+          </div>
+          <div class="form-group"><label>যোগদানের তারিখ</label><input type="date" id="new-mem-date"></div>
+          <button class="btn btn-gold" onclick="addMember()">✅ সদস্য যোগ করুন</button>
+          <p style="font-size:10px;color:var(--text2);margin-top:8px;text-align:center;">নতুন সদস্য যোগে সবার ownership % পুনর্গণনা হবে</p>
+        </div>
+      </div>
+      <div id="mem-exit-panel" style="display:none;">
+        <div class="card">
+          <div class="form-group"><label>সদস্য</label><select id="exit-member" onchange="showExitPreview()"></select></div>
+          <div id="exit-preview" style="margin-bottom:13px;"></div>
+          <button class="btn btn-red" onclick="processMemberExit()">🚪 Exit প্রক্রিয়া করুন</button>
+        </div>
+        <div class="sec-head" style="margin-top:8px;">Exit হওয়া সদস্য</div>
+        <div id="exited-members-list"></div>
+      </div>
+    </div>
+
+    <!-- BACKUP -->
+    <div id="page-backup" class="page">
+      <div class="sec-head">💾 ব্যাকআপ ও রিস্টোর</div>
+      <div class="card" style="background:var(--green-dim);border-color:rgba(46,204,113,0.3);margin-bottom:11px;">
+        <div style="font-size:12px;font-weight:700;color:var(--green);">☁️ Firebase Auto-Sync চালু</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;">সব ডেটা real-time এ সবার ফোনে sync হচ্ছে।</div>
+      </div>
+      <div class="list-item" onclick="downloadBackup()" style="cursor:pointer;">
+        <div style="font-size:13px;font-weight:700;">📥 ফাইল ডাউনলোড</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px;">JSON ফাইল হিসেবে সেভ করুন</div>
+      </div>
+      <div class="list-item" onclick="document.getElementById('restore-file').click()" style="cursor:pointer;">
+        <div style="font-size:13px;font-weight:700;">📤 ফাইল থেকে রিস্টোর</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px;">আগের ব্যাকআপ ফিরিয়ে আনুন</div>
+      </div>
+      <input type="file" id="restore-file" accept=".json" style="display:none;" onchange="restoreFromFile(this)">
+      <div class="card" style="margin-top:8px;">
+        <div style="font-size:11px;color:var(--text2);line-height:1.7;">
+          ⚠️ <strong style="color:var(--gold);">সতর্কতা:</strong> রিস্টোর করলে বর্তমান সব ডেটা মুছে যাবে।
         </div>
       </div>
 
-      <div class="card">
-        <h2>আসন্ন ও বকেয়া কিস্তি</h2>
-        <div id="dueWidget"></div>
+      <!-- TRASH SECTION -->
+      <div class="sec-head" style="margin-top:16px;">🗑️ Trash (মুছা আইটেম)</div>
+      <div class="card" style="background:var(--red-dim);border-color:var(--red);margin-bottom:11px;">
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">
+          ডিলিট করা আইটেম ৩০ দিন এখানে থাকবে। এই সময়ে Restore করা যাবে। ৩০ দিন পর স্থায়ীভাবে মুছে যাবে।
+        </div>
       </div>
-    </section>
+      <div id="trash-list"></div>
+      <button onclick="emptyTrash()" class="btn btn-red" style="margin-top:8px;">🗑️ Trash খালি করুন</button>
+    </div>
 
-    <!-- DEPOSITS -->
-    <section class="page" id="page-deposits">
-      <div class="section-title">💳 চাঁদা (Monthly Deposits)</div>
-      <div class="card" id="depositLockNote" style="display:none"><div class="locked-note">শুধু দেখার অধিকার — নতুন জমা দিতে Editor PIN দিয়ে প্রবেশ করুন</div></div>
-      <div class="card"><h2>সাম্প্রতিক জমা</h2><div id="depositList"></div></div>
-    </section>
+  </div>
 
-    <!-- INVESTMENTS -->
-    <section class="page" id="page-investments">
-      <div class="section-title">📈 বিনিয়োগ</div>
-      <div class="tabs" id="invTabs">
-        <button data-t="list" class="active">তালিকা</button>
-        <button data-t="recover">কিস্তি আদায়</button>
-      </div>
-      <div id="invTabList"><div id="investmentList"></div></div>
-      <div id="invTabRecover" style="display:none"></div>
-    </section>
-
-    <!-- EXPENSES -->
-    <section class="page" id="page-expenses">
-      <div class="section-title">💸 খরচ</div>
-      <div class="card"><h2>খরচের তালিকা</h2><div id="expenseList"></div></div>
-    </section>
-
-    <!-- MEMBERS -->
-    <section class="page" id="page-members">
-      <div class="section-title">👥 সদস্য</div>
-      <div class="tabs" id="memberTabs">
-        <button data-t="profile" class="active">প্রোফাইল</button>
-        <button data-t="transfer">শেয়ার ট্রান্সফার</button>
-        <button data-t="new">নতুন সদস্য</button>
-        <button data-t="exit">Exit</button>
-      </div>
-      <div id="memTabProfile"><div id="memberProfileList"></div></div>
-      <div id="memTabTransfer" style="display:none"></div>
-      <div id="memTabNew" style="display:none"></div>
-      <div id="memTabExit" style="display:none"></div>
-    </section>
-
-    <!-- BACKUP -->
-    <section class="page" id="page-backup">
-      <div class="section-title">💾 ব্যাকআপ</div>
-      <div class="card">
-        <h2>সিঙ্ক স্ট্যাটাস</h2>
-        <div class="list-item"><div><div class="main">Firebase Auto-Sync</div><div class="sub" id="syncStatus">সংযুক্ত হচ্ছে…</div></div><span class="tag completed" id="syncTag">চালু</span></div>
-      </div>
-      <div class="card">
-        <h2>JSON ব্যাকআপ</h2>
-        <button class="btn btn-primary" id="downloadBackupBtn" style="margin-bottom:10px;">⬇️ JSON ডাউনলোড করুন</button>
-        <label class="btn btn-secondary" style="display:block;cursor:pointer;" id="restoreLabel">⬆️ ফাইল থেকে Restore করুন
-          <input type="file" id="restoreFile" accept="application/json" style="display:none;">
-        </label>
-      </div>
-      <div class="card">
-        <h2>🗑️ Trash</h2>
-        <div class="form-hint" style="margin-bottom:10px;">৩০ দিনের মধ্যে Restore করা যাবে, পরে স্থায়ীভাবে মুছে যাবে।</div>
-        <div id="trashList"></div>
-      </div>
-    </section>
-
-  </main>
-
-  <nav class="bottom-nav" id="bottomNav">
-    <button data-page="dashboard" class="active"><span class="ic">📊</span>হোম</button>
-    <button data-page="deposits"><span class="ic">💳</span>চাঁদা</button>
-    <button data-page="investments"><span class="ic">📈</span>বিনিয়োগ</button>
-    <button data-page="expenses"><span class="ic">💸</span>খরচ</button>
-    <button data-page="members"><span class="ic">👥</span>সদস্য</button>
-    <button data-page="backup"><span class="ic">💾</span>ব্যাকআপ</button>
+  <nav id="nav">
+    <button class="nav-btn active" onclick="showPage('dashboard',this)"><span class="icon">📊</span>ড্যাশ</button>
+    <button class="nav-btn" onclick="showPage('deposit',this)"><span class="icon">💳</span>চাঁদা</button>
+    <button class="nav-btn" onclick="showPage('investment',this)"><span class="icon">📈</span>বিনিয়োগ</button>
+    <button class="nav-btn" onclick="showPage('expenses',this)"><span class="icon">💸</span>খরচ</button>
+    <button class="nav-btn" onclick="showPage('members',this)"><span class="icon">👥</span>সদস্য</button>
+    <button class="nav-btn" onclick="showPage('backup',this)"><span class="icon">💾</span>ব্যাকআপ</button>
   </nav>
-
-  <button class="fab" id="fabBtn">+</button>
 </div>
 
-<div id="modal-overlay"><div id="modal"></div></div>
-<div class="toast" id="toast"></div>
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title"><span id="edit-modal-title">এডিট</span><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div id="edit-modal-body"></div>
+  </div>
+</div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="app.js"></script>
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCrdpS347N4Y_CH18Vws6QmML8VK53qBQ0",
+    authDomain: "unity-capital-2026.firebaseapp.com",
+    databaseURL: "https://unity-capital-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "unity-capital-2026",
+    storageBucket: "unity-capital-2026.firebasestorage.app",
+    messagingSenderId: "469285522407",
+    appId: "1:469285522407:web:30332f48e551cf56488b42"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.fbDb = db;
+window.fbRef = ref;
+window.fbSet = set;
+window.fbGet = get;
+window.fbOnValue = onValue;
+window.fbRemove = remove;
+window.fbUpdate = update;
+
+// Test connection
+get(ref(db, '.info/connected')).then(() => {
+  document.getElementById('firebase-dot').classList.add('connected');
+  document.getElementById('sync-status').textContent = '✅ Firebase সংযুক্ত';
+}).catch(() => {
+  document.getElementById('sync-status').textContent = '❌ সংযোগ ব্যর্থ';
+});
+
+// Real-time listener
+onValue(ref(db, 'ucdata'), (snapshot) => {
+  const data = snapshot.val();
+  if(data) {
+    window._fbData = data;
+    if(window._appReady) window.renderCurrentPage();
+  }
+});
+</script>
+
+<script>
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+let currentRole = null;
+let pinBuffer = '';
+let _appReady = false;
+let currentPage = 'dashboard';
+let selectedMemberId = null;
+
+const PINS = { viewer:'1234', editor:'9966' };
+
+const DEFAULT_MEMBERS = [
+  {id:'M001',name:'MH Shuvo',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M002',name:'Mujammel Hoque',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M003',name:'Sajjat Jamil',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M004',name:'Shahidullah jr',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M005',name:'A.A. Rabbani',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M006',name:'Asadullah Galib',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M007',name:'Mohammad Iqbal',joinDate:'2026-06-01',status:'Active',extraShares:0},
+  {id:'M008',name:'Kawsar',joinDate:'2026-06-01',status:'Active',extraShares:0},
+];
+
+// ══════════════════════════════
+// FIREBASE DATA
+// ══════════════════════════════
+function loadData() {
+  const d = window._fbData || {};
+  return {
+    members: Object.values(d.members||{}).sort((a,b)=>a.id>b.id?1:-1),
+    deposits: Object.values(d.deposits||{}),
+    investments: Object.values(d.investments||{}),
+    recoveries: Object.values(d.recoveries||{}),
+    expenses: Object.values(d.expenses||{}),
+    transfers: Object.values(d.transfers||{}),
+  };
+}
+
+async function fbWrite(path, data) {
+  if(!window.fbDb) return;
+  await window.fbSet(window.fbRef(window.fbDb, path), data);
+}
+
+async function fbDelete(path) {
+  if(!window.fbDb) return;
+  await window.fbRemove(window.fbRef(window.fbDb, path));
+}
+
+async function initFirebase() {
+  if(!window.fbDb) return;
+  const snap = await window.fbGet(window.fbRef(window.fbDb, 'ucdata/members'));
+  if(!snap.exists()) {
+    // First time - seed members
+    const membersObj = {};
+    DEFAULT_MEMBERS.forEach(m => membersObj[m.id] = m);
+    await fbWrite('ucdata/members', membersObj);
+    showToast('✅ প্রথমবার সেটআপ সম্পন্ন!');
+  }
+}
+
+// ══════════════════════════════
+// PIN
+// ══════════════════════════════
+function pinPress(val) {
+  if(val==='clr') pinBuffer=pinBuffer.slice(0,-1);
+  else if(pinBuffer.length<4) pinBuffer+=val;
+  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinBuffer.length);
+  if(pinBuffer.length===4) setTimeout(checkPin,150);
+}
+
+function checkPin() {
+  if(pinBuffer===PINS.editor) { currentRole='editor'; enterApp(); }
+  else if(pinBuffer===PINS.viewer) { currentRole='viewer'; enterApp(); }
+  else {
+    document.getElementById('pin-error').textContent='❌ ভুল PIN! আবার চেষ্টা করুন।';
+    pinBuffer=''; for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
+    setTimeout(()=>document.getElementById('pin-error').textContent='',2000);
+  }
+}
+
+async function enterApp() {
+  await initFirebase();
+  document.getElementById('pin-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const pill=document.getElementById('role-pill');
+  pill.textContent=currentRole==='editor'?'EDITOR':'VIEWER';
+  pill.className=currentRole==='editor'?'pill-editor':'pill-viewer';
+  window._appReady=true;
+  renderDashboard();
+  renderDepositPage();
+}
+
+function lockApp() {
+  currentRole=null; pinBuffer='';
+  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
+  document.getElementById('pin-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  window._appReady=false;
+}
+
+// ══════════════════════════════
+// CALCULATIONS
+// ══════════════════════════════
+function calcStats() {
+  const d=loadData();
+  const activeMem=d.members.filter(m=>m.status==='Active');
+  
+  // Principal per member (ownership basis)
+  const principalMap={};
+  d.members.forEach(m=>principalMap[m.id]=0);
+  d.deposits.forEach(dep=>{ if(principalMap[dep.memberId]!==undefined) principalMap[dep.memberId]+=(dep.principal||0); });
+  
+  // Extra shares from transfers
+  const extraShareMap={};
+  d.members.forEach(m=>extraShareMap[m.id]=parseFloat(m.extraShares||0));
+  
+  const activeDeposits=d.deposits.filter(x=>!x.deletedAt);
+  const totalPrincipal=activeDeposits.reduce((s,x)=>s+(x.principal||0),0);
+  const totalPenalty=activeDeposits.reduce((s,x)=>s+(x.latePenalty||0)+(x.duePenalty||0),0);
+  
+  // Total invested in running investments
+  const totalInvestedAmount=d.investments.filter(i=>i.status==='Running').reduce((s,i)=>s+i.amount,0);
+  
+  // Total recovered principal from ALL investments (running + completed)
+  const totalRecoveredPrincipal=d.recoveries.reduce((s,r)=>s+(r.principal||0),0);
+  // Also include advances
+  const totalAdvance=d.investments.reduce((s,i)=>s+(i.advanceAmount||0),0);
+  const totalAdvanceRecovered=d.investments.reduce((s,i)=>s+(i.advanceRecovered?i.advanceAmount||0:0),0);
+  
+  // Active investment = what's still locked up
+  // = total invested - recovered principal - recovered advance
+  const totalReturnedPrincipal=totalRecoveredPrincipal+totalAdvanceRecovered;
+  const totalInvested=Math.max(0, totalInvestedAmount - totalReturnedPrincipal);
+  
+  // Profit/Loss: calculated when investment cost fully recovered
+  let totalProfit=0;
+  let totalLoss=0;
+  d.investments.forEach(inv=>{
+    const recs=d.recoveries.filter(r=>r.invId===inv.id&&!r.deleted);
+    const totalRecovered=recs.reduce((s,r)=>s+(r.amount||r.principal||0),0);
+    const advance=inv.advance||0;
+    const cost=inv.amount||0;
+    const target=inv.target||cost;
+    // Only count profit/loss when cost is fully recovered
+    if(totalRecovered>cost) {
+      totalProfit+=totalRecovered-cost;
+    } else if(inv.status==='Completed'&&totalRecovered<cost) {
+      totalLoss+=cost-totalRecovered;
+    }
+  });
+  const totalExpenses=d.expenses.reduce((s,e)=>s+(e.amount||0),0);
+  const totalAssets=totalPrincipal+totalPenalty+totalProfit+totalReturnedPrincipal-totalLoss-totalExpenses;
+  const cashBalance=totalAssets-totalInvested;
+  
+  // Ownership: based on principal + extra shares (from transfers)
+  const totalActivePrincipal=activeMem.reduce((s,m)=>s+(principalMap[m.id]||0),0);
+  const ownership={};
+  const baseN=activeMem.length||1;
+  
+  activeMem.forEach(m=>{
+    let base=totalActivePrincipal>0?(principalMap[m.id]||0)/totalActivePrincipal:1/baseN;
+    // Add extra shares from transfers (in percentage points)
+    let extra=(extraShareMap[m.id]||0)/100;
+    ownership[m.id]=Math.max(0, base+extra);
+  });
+  
+  // Normalize ownership to sum to 1
+  const ownershipSum=Object.values(ownership).reduce((s,v)=>s+v,0);
+  if(ownershipSum>0) Object.keys(ownership).forEach(k=>ownership[k]=ownership[k]/ownershipSum);
+  
+  return {totalPrincipal,totalPenalty,totalInvested,totalProfit,
+    totalLoss:totalLoss+totalExpenses,totalAssets,cashBalance,
+    ownership,principalMap,activeMem,
+    runningInv:d.investments.filter(i=>i.status==='Running').length};
+}
+
+function fmt(n){ return '৳'+Math.abs(Math.round(n||0)).toLocaleString('en-IN'); }
+function fmtPct(n){ return ((n||0)*100).toFixed(2)+'%'; }
+
+// ══════════════════════════════
+// NAVIGATION
+// ══════════════════════════════
+function showPage(name,btn) {
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  renderCurrentPage();
+}
+
+function renderCurrentPage() {
+  if(currentPage==='dashboard') renderDashboard();
+  else if(currentPage==='deposit') renderRecentDeposits();
+  else if(currentPage==='investment') renderInvestmentList();
+  else if(currentPage==='expenses') renderExpenseList();
+  else if(currentPage==='members') renderMembersPage();
+}
+
+window.renderCurrentPage=renderCurrentPage;
+
+// ══════════════════════════════
+// DASHBOARD
+// ══════════════════════════════
+function renderDashboard() {
+  const s=calcStats();
+  document.getElementById('d-total-assets').textContent=fmt(s.totalAssets);
+  document.getElementById('d-cash').textContent=fmt(s.cashBalance);
+  document.getElementById('d-invested').textContent=fmt(s.totalInvested);
+  document.getElementById('d-principal').textContent=fmt(s.totalPrincipal);
+  document.getElementById('d-penalty').textContent=fmt(s.totalPenalty);
+  document.getElementById('d-profit').textContent=fmt(s.totalProfit);
+  document.getElementById('d-loss').textContent=fmt(s.totalLoss);
+  document.getElementById('d-members').textContent=s.activeMem.length;
+  document.getElementById('d-running-inv').textContent=s.runningInv;
+  const ol=document.getElementById('ownership-list');
+  ol.innerHTML=s.activeMem.map(m=>{
+    const pct=s.ownership[m.id]||0;
+    const label=m.ucCode?`${m.ucCode} · ${m.name}`:m.name;
+    return `<div class="own-item"><div class="own-name" title="${label}">${label}</div><div class="own-bar-wrap"><div class="own-bar" style="width:${pct*100}%"></div></div><div class="own-pct">${fmtPct(pct)}</div></div>`;
+  }).join('')||'<div style="color:var(--text2);font-size:12px;">কোনো সদস্য নেই</div>';
+  const now=new Date();
+  document.getElementById('header-sub').textContent='আপডেট: '+now.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'});
+  renderUpcomingInstallments();
+}
+
+function renderUpcomingInstallments() {
+  const d=loadData();
+  const el=document.getElementById('upcoming-installments-list');
+  if(!el) return;
+  
+  const today=new Date(); today.setHours(0,0,0,0);
+  const items=[];
+  
+  d.investments.forEach(inv=>{
+    if(!inv.installments) return;
+    inv.installments.forEach(inst=>{
+      if(inst.status==='paid') return;
+      const nd=new Date(inst.expectedDate); nd.setHours(0,0,0,0);
+      const diff=Math.round((nd-today)/(1000*60*60*24));
+      if(diff<=14) { // Show next 14 days + overdue
+        items.push({inv,inst,diff});
+      }
+    });
+  });
+  
+  items.sort((a,b)=>a.diff-b.diff);
+  
+  if(!items.length) {
+    el.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center;padding:8px;">কোনো আসন্ন কিস্তি নেই ✅</div>';
+    return;
+  }
+  
+  el.innerHTML=items.map(({inv,inst,diff})=>{
+    const isOverdue=diff<0;
+    const isToday=diff===0;
+    const color=isOverdue?'var(--red)':isToday?'var(--orange)':diff<=7?'var(--orange)':'var(--text2)';
+    const icon=isOverdue?'⚠️':isToday?'🔴':'🔔';
+    const diffText=isOverdue?`${Math.abs(diff)} দিন বকেয়া`:isToday?'আজ':`${diff} দিন পরে`;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:12px;font-weight:700;">${icon} ${inv.name}</div>
+        <div style="font-size:11px;color:${color};">${inst.num} নং কিস্তি · ${diffText}</div>
+        <div style="font-size:10px;color:var(--text2);">${inst.expectedDate}</div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:${color};">${fmt(inst.amount)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════
+// DEPOSITS
+// ══════════════════════════════
+function renderDepositPage() {
+  const d=loadData();
+  const sel=document.getElementById('dep-member');
+  sel.innerHTML=d.members.filter(m=>m.status==='Active').map(m=>`<option value="${m.id}">${m.ucCode?m.ucCode+' · ':''} ${m.name}</option>`).join('');
+  const now=new Date();
+  document.getElementById('dep-month').value=now.toISOString().slice(0,7);
+  document.getElementById('dep-date').value=now.toISOString().slice(0,10);
+  renderRecentDeposits();
+}
+
+function calcDepTotal() {
+  const p=parseInt(document.getElementById('dep-principal').value)||0;
+  const pen=parseInt(document.getElementById('dep-penalty-amt').value)||0;
+  const note=document.getElementById('dep-limit-note');
+  if(p>2000) { note.textContent='⚠️ সর্বোচ্চ ২০০০৳ দেওয়া যাবে!'; document.getElementById('dep-principal').value=2000; return; }
+  else note.textContent='';
+  document.getElementById('dep-total-preview').textContent=fmt(p+pen);
+  document.getElementById('dep-total-box').style.display=p>0?'flex':'none';
+}
+
+async function saveDeposit() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor এন্ট্রি দিতে পারবে');return;}
+  const memberId=document.getElementById('dep-member').value;
+  const month=document.getElementById('dep-month').value;
+  const depDate=document.getElementById('dep-date').value;
+  const principal=parseInt(document.getElementById('dep-principal').value)||0;
+  const penalty=parseInt(document.getElementById('dep-penalty-amt').value)||0;
+  if(!memberId||!month||!depDate||!principal){showToast('❌ সব তথ্য পূরণ করুন');return;}
+  if(principal>2000){showToast('❌ সর্বোচ্চ ২০০০৳ দেওয়া যাবে');return;}
+  const id='dep_'+Date.now();
+  await fbWrite(`ucdata/deposits/${id}`,{id,memberId,month,depDate,principal,latePenalty:0,duePenalty:penalty,total:principal+penalty,createdAt:new Date().toISOString()});
+  showToast('✅ জমা সেভ হয়েছে!');
+  document.getElementById('dep-principal').value='';
+  document.getElementById('dep-penalty-amt').value=0;
+  document.getElementById('dep-total-box').style.display='none';
+}
+
+function renderRecentDeposits() {
+  const d=loadData();
+  const el=document.getElementById('recent-deposits');
+  if(!el) return;
+  const recent=[...d.deposits].sort((a,b)=>b.createdAt>a.createdAt?1:-1).slice(0,20);
+  const mm={};d.members.forEach(m=>mm[m.id]=(m.ucCode?m.ucCode+' · ':'')+m.name);
+  if(!recent.length){el.innerHTML='<div class="empty"><div class="e-icon">💳</div>কোনো জমা নেই</div>';return;}
+  el.innerHTML=recent.map(dep=>`
+    <div class="list-item">
+      <div class="list-header">
+        <div><div class="list-name">${mm[dep.memberId]||'?'}</div><div style="font-size:11px;color:var(--text2);">${dep.month} · ${dep.depDate}</div></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--green);">${fmt(dep.total)}</div>
+      </div>
+      ${dep.duePenalty>0?`<div style="font-size:11px;color:var(--red);">জরিমানা: ${fmt(dep.duePenalty)}</div>`:''}
+      ${currentRole==='editor'?`<div class="action-row"><button class="btn-edit" onclick="editDeposit('${dep.id}')">✏️ এডিট</button><button class="btn-del" onclick="deleteDeposit('${dep.id}')">🗑️</button></div>`:''}
+    </div>`).join('');
+}
+
+function editDeposit(id) {
+  const d=loadData();
+  const dep=d.deposits.find(x=>x.id===id);
+  if(!dep) return;
+  const mm={};d.members.forEach(m=>mm[m.id]=(m.ucCode?m.ucCode+' · ':'')+m.name);
+  document.getElementById('edit-modal-title').textContent='জমা এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>সদস্য</label><input value="${mm[dep.memberId]}" disabled style="opacity:.6;"></div>
+    <div class="form-row">
+      <div class="form-group"><label>মাস</label><input type="month" id="e-dep-month" value="${dep.month}"></div>
+      <div class="form-group"><label>তারিখ</label><input type="date" id="e-dep-date" value="${dep.depDate}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>মূল জমা (সর্বোচ্চ ২০০০)</label><input type="number" id="e-dep-principal" value="${dep.principal}" max="2000"></div>
+      <div class="form-group"><label>জরিমানা</label><input type="number" id="e-dep-penalty" value="${dep.duePenalty||0}"></div>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditDeposit('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteDeposit('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditDeposit(id) {
+  const principal=parseInt(document.getElementById('e-dep-principal').value)||0;
+  if(principal>2000){showToast('❌ সর্বোচ্চ ২০০০৳');return;}
+  const penalty=parseInt(document.getElementById('e-dep-penalty').value)||0;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/deposits/${id}`),{
+    month:document.getElementById('e-dep-month').value,
+    depDate:document.getElementById('e-dep-date').value,
+    principal,duePenalty:penalty,latePenalty:0,total:principal+penalty
+  });
+  closeModal();showToast('✅ আপডেট হয়েছে!');
+}
+
+async function deleteDeposit(id) {
+  if(!confirm('এই জমা Trash এ পাঠাবেন? ৩০ দিন পর স্থায়ীভাবে মুছবে।')) return;
+  await moveToTrash('deposits', id);
+  closeModal();showToast('🗑️ Trash এ পাঠানো হয়েছে');
+}
+
+// ══════════════════════════════
+// INVESTMENTS
+// ══════════════════════════════
+function invTab(name,el) {
+  document.querySelectorAll('#page-investment .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['list','schedule','add','recovery'].forEach(n=>{
+    const panel=document.getElementById('inv-'+n+'-panel');
+    if(panel) panel.style.display=n===name?'block':'none';
+  });
+  if(name==='list') renderInvestmentList();
+  if(name==='schedule') renderInstallmentSchedule();
+  if(name==='recovery') { populateRecoveryDropdown(); populateAdvanceDropdown(); populateHistoryDropdown(); }
+}
+
+function recTab(name,el) {
+  document.querySelectorAll('#inv-recovery-panel .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['installment','advance','history'].forEach(n=>{
+    const panel=document.getElementById('rec-'+n+'-panel');
+    if(panel) panel.style.display=n===name?'block':'none';
+  });
+  if(name==='history') renderRecoveryHistory();
+}
+
+function getInstallmentStatus(inv) {
+  if(!inv.installments||!inv.installments.length) return null;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const pending=inv.installments.filter(i=>i.status==='pending');
+  const overdue=pending.filter(i=>new Date(i.expectedDate)<today);
+  const upcoming=pending.filter(i=>{
+    const d=new Date(i.expectedDate); d.setHours(0,0,0,0);
+    const diff=(d-today)/(1000*60*60*24);
+    return diff>=0 && diff<=7;
+  });
+  return {total:inv.installments.length, paid:inv.installments.filter(i=>i.status==='paid').length, overdue:overdue.length, upcoming:upcoming.length, next:pending[0]||null};
+}
+
+function renderInvestmentList() {
+  const d=loadData();
+  const el=document.getElementById('inv-list-content');
+  if(!el) return;
+  if(!d.investments.length){el.innerHTML='<div class="empty"><div class="e-icon">📈</div>কোনো বিনিয়োগ নেই</div>';return;}
+  
+  const recMap={};
+  d.recoveries.forEach(r=>{if(!recMap[r.invId])recMap[r.invId]={principal:0,profit:0};recMap[r.invId].principal+=r.principal||0;recMap[r.invId].profit+=r.profit||0;});
+  
+  // Sort: overdue first, then upcoming, then others
+  const sorted=[...d.investments].sort((a,b)=>{
+    const sa=getInstallmentStatus(a), sb=getInstallmentStatus(b);
+    if(sa&&sa.overdue>0 && !(sb&&sb.overdue>0)) return -1;
+    if(sb&&sb.overdue>0 && !(sa&&sa.overdue>0)) return 1;
+    if(sa&&sa.upcoming>0 && !(sb&&sb.upcoming>0)) return -1;
+    if(sb&&sb.upcoming>0 && !(sa&&sa.upcoming>0)) return 1;
+    return b.createdAt>a.createdAt?1:-1;
+  });
+  
+  el.innerHTML=sorted.map(inv=>{
+    const rec=recMap[inv.id]||{principal:0,profit:0};
+    const ist=getInstallmentStatus(inv);
+    const totalRecovered=rec.principal+(inv.advanceRecovered?inv.advanceAmount||0:0);
+    const stillLocked=Math.max(0,inv.amount-totalRecovered);
+    
+    let installmentBadge='';
+    if(ist) {
+      if(ist.overdue>0) installmentBadge=`<span style="background:var(--red-dim);color:var(--red);font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px;">⚠️ ${ist.overdue}টি বকেয়া</span>`;
+      else if(ist.upcoming>0) installmentBadge=`<span style="background:var(--orange-dim);color:var(--orange);font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px;">🔔 আসছে</span>`;
+    }
+    
+    let nextInstallment='';
+    if(ist&&ist.next) {
+      const today=new Date(); today.setHours(0,0,0,0);
+      const nd=new Date(ist.next.expectedDate); nd.setHours(0,0,0,0);
+      const diff=Math.round((nd-today)/(1000*60*60*24));
+      const diffText=diff<0?`${Math.abs(diff)} দিন আগে`:diff===0?'আজ':`${diff} দিন পরে`;
+      const color=diff<0?'var(--red)':diff<=7?'var(--orange)':'var(--text2)';
+      nextInstallment=`<div style="font-size:11px;color:${color};margin-top:4px;">পরবর্তী কিস্তি: ${ist.next.expectedDate} (${diffText}) — ${fmt(ist.next.amount)}</div>`;
+    }
+    
+    return `<div class="list-item">
+      <div class="list-header">
+        <div><div class="list-name">${inv.name}${installmentBadge}</div></div>
+        <div class="badge ${inv.status==='Running'?'badge-running':'badge-completed'}">${inv.status==='Running'?'চলমান':'সমাপ্ত'}</div>
+      </div>
+      ${inv.advanceAmount>0?`<div class="list-row"><span>অগ্রিম জমা</span><span style="color:var(--gold);">${fmt(inv.advanceAmount)}</span></div>`:''}
+      <div class="list-row"><span>মোট বিনিয়োগ</span><span>${fmt(inv.amount)}</span></div>
+      <div class="list-row"><span>মোট আদায়</span><span style="color:var(--green);">${fmt(totalRecovered)}</span></div>
+      <div class="list-row"><span>এখনো বাকি</span><span style="color:var(--red);">${fmt(stillLocked)}</span></div>
+      ${rec.profit>0?`<div class="profit-row"><span>মোট লাভ</span><span class="pv">${fmt(rec.profit)}</span></div>`:''}
+      ${ist?`<div style="font-size:11px;color:var(--text2);margin-top:4px;">কিস্তি: ${ist.paid}/${ist.total} আদায়</div>`:''}
+      ${nextInstallment}
+      ${currentRole==='editor'?`<div class="action-row">
+        <button class="btn-edit" onclick="editInvestment('${inv.id}')">✏️ এডিট</button>
+        <button class="btn-edit" onclick="showInstallmentSchedule('${inv.id}')" style="background:var(--blue-dim);border-color:var(--blue);color:var(--blue);">📅 কিস্তি</button>
+        ${inv.status==='Running'?`<button class="btn-complete" onclick="markCompleted('${inv.id}')">✅ সমাপ্ত</button>`:''}
+        <button class="btn-del" onclick="deleteInvestment('${inv.id}')">🗑️</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function showInstallmentSchedule(invId) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments||!inv.installments.length) {showToast('এই বিনিয়োগে কিস্তি নেই'); return;}
+  
+  const today=new Date(); today.setHours(0,0,0,0);
+  document.getElementById('edit-modal-title').textContent=`${inv.name} — কিস্তি তালিকা`;
+  
+  let rows='';
+  if(inv.advanceAmount>0) {
+    rows+=`<div style="background:var(--gold-dim);border:1px solid var(--gold);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div><div style="font-size:12px;font-weight:700;color:var(--gold);">💰 অগ্রিম জমা</div><div style="font-size:11px;color:var(--text2);">${inv.advanceDate||'—'}</div></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--gold);">${fmt(inv.advanceAmount)} ✅</div>
+    </div>`;
+  }
+  
+  inv.installments.forEach(inst=>{
+    const nd=new Date(inst.expectedDate); nd.setHours(0,0,0,0);
+    const isOverdue=inst.status==='pending' && nd<today;
+    const isUpcoming=inst.status==='pending' && (nd-today)/(1000*60*60*24)<=7 && nd>=today;
+    const bg=inst.status==='paid'?'var(--green-dim)':isOverdue?'var(--red-dim)':isUpcoming?'var(--orange-dim)':'var(--navy3)';
+    const borderColor=inst.status==='paid'?'rgba(46,204,113,0.3)':isOverdue?'rgba(231,76,60,0.3)':isUpcoming?'rgba(230,126,34,0.3)':'var(--border)';
+    const statusIcon=inst.status==='paid'?'✅':isOverdue?'⚠️':isUpcoming?'🔔':'⏳';
+    
+    rows+=`<div style="background:${bg};border:1px solid ${borderColor};border-radius:8px;padding:10px 12px;margin-bottom:7px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:12px;font-weight:700;">${statusIcon} ${inst.num} নং কিস্তি</div>
+          <div style="font-size:11px;color:var(--text2);">Expected: ${inst.expectedDate}</div>
+          ${inst.paidDate?`<div style="font-size:11px;color:var(--green);">আদায়: ${inst.paidDate} — ${fmt(inst.paidAmount)}</div>`:''}
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;">${fmt(inst.amount)}</div>
+          ${inst.status==='pending'&&currentRole==='editor'?`<button onclick="quickPayInstallment('${invId}',${inst.num-1})" style="margin-top:4px;padding:4px 10px;background:var(--gold);color:var(--navy);border:none;border-radius:6px;font-size:11px;cursor:pointer;">আদায় করুন</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  
+  document.getElementById('edit-modal-body').innerHTML=rows+`<button class="btn btn-gold" onclick="closeModal()" style="margin-top:8px;">বন্ধ করুন</button>`;
+  openModal();
+}
+
+async function quickPayInstallment(invId, instIdx) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv) return;
+  const inst=inv.installments[instIdx];
+  const today=new Date().toISOString().slice(0,10);
+  const amount=inst.amount;
+  
+  // Calculate if this is principal or profit
+  const totalInvested=inv.amount;
+  const alreadyRecovered=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.principal||0),0)+(inv.advanceRecovered?inv.advanceAmount||0:0);
+  const isPrincipal=alreadyRecovered<totalInvested;
+  const principalPart=isPrincipal?Math.min(amount,totalInvested-alreadyRecovered):0;
+  const profitPart=amount-principalPart;
+  
+  // Save recovery
+  const recId='rec_'+Date.now();
+  await fbWrite(`ucdata/recoveries/${recId}`,{id:recId,invId,date:today,principal:principalPart,profit:profitPart,installmentNum:inst.num,createdAt:new Date().toISOString()});
+  
+  // Update installment status
+  const updatedInstallments=[...inv.installments];
+  updatedInstallments[instIdx]={...inst,status:'paid',paidDate:today,paidAmount:amount};
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInstallments});
+  
+  // Check if fully recovered
+  const newTotalRec=alreadyRecovered+principalPart;
+  if(newTotalRec>=totalInvested && updatedInstallments.every(i=>i.status==='paid')) {
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{status:'Completed'});
+  }
+  
+  closeModal();
+  showToast(`✅ ${inst.num} নং কিস্তি আদায় — মূল: ${fmt(principalPart)}, লাভ: ${fmt(profitPart)}`);
+}
+
+function editInvestment(id) {
+  const d=loadData();
+  const inv=d.investments.find(x=>x.id===id);
+  if(!inv) return;
+  document.getElementById('edit-modal-title').textContent='বিনিয়োগ এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>প্রকল্পের নাম</label><input type="text" id="e-inv-name" value="${inv.name}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>তারিখ</label><input type="date" id="e-inv-date" value="${inv.date}"></div>
+      <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inv-amount" value="${inv.amount}"></div>
+    </div>
+    <div class="form-group"><label>নোট</label><textarea id="e-inv-note">${inv.note||''}</textarea></div>
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditInvestment('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteInvestment('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditInvestment(id) {
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${id}`),{
+    name:document.getElementById('e-inv-name').value,
+    date:document.getElementById('e-inv-date').value,
+    amount:parseFloat(document.getElementById('e-inv-amount').value)||0,
+    note:document.getElementById('e-inv-note').value
+  });
+  closeModal();showToast('✅ আপডেট হয়েছে!');
+}
+
+async function deleteInvestment(id) {
+  if(!confirm('এই বিনিয়োগ Trash এ পাঠাবেন?\nসংশ্লিষ্ট কিস্তিও Trash এ যাবে।')) return;
+  await moveToTrash('investments', id);
+  // Also trash related recoveries
+  const d=loadData();
+  for(const r of d.recoveries.filter(r=>r.invId===id)) {
+    await moveToTrash('recoveries', r.id);
+  }
+  closeModal();showToast('🗑️ Trash এ পাঠানো হয়েছে');
+}
+
+// ── Installment Planning ──
+function calcInstallmentPlan() {
+  const amount = parseFloat(document.getElementById('inv-amount').value)||0;
+  const advance = parseFloat(document.getElementById('inv-advance').value)||0;
+  const count = parseInt(document.getElementById('inv-installment-count').value)||0;
+  const firstDate = document.getElementById('inv-first-date').value;
+  const type = document.getElementById('inv-installment-type').value;
+  const preview = document.getElementById('installment-preview');
+  
+  if(!amount || !count || !firstDate) { preview.innerHTML=''; return; }
+  
+  const remaining = amount - advance;
+  const autoAmt = Math.ceil(remaining / count);
+  const lastAmt = remaining - (autoAmt * (count-1));
+  
+  // Set auto amount if not manually set
+  const manualAmt = parseFloat(document.getElementById('inv-installment-amt').value)||0;
+  const installAmt = manualAmt > 0 ? manualAmt : autoAmt;
+  if(!manualAmt) document.getElementById('inv-installment-amt').value = autoAmt;
+  
+  const lastInstallAmt = remaining - (installAmt * (count-1));
+  
+  preview.innerHTML = `
+    <div style="background:var(--navy2);border-radius:8px;padding:10px;font-size:11px;">
+      ${advance>0?`<div style="display:flex;justify-content:space-between;color:var(--gold);margin-bottom:5px;"><span>অগ্রিম জমা</span><span>৳${advance.toLocaleString('en-IN')}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;color:var(--text2);"><span>মোট কিস্তির টাকা</span><span>৳${remaining.toLocaleString('en-IN')}</span></div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2);margin-top:3px;"><span>প্রতি কিস্তি (১-${count-1})</span><span>৳${installAmt.toLocaleString('en-IN')}</span></div>
+      <div style="display:flex;justify-content:space-between;color:var(--orange);margin-top:3px;"><span>শেষ কিস্তি (${count} নং)</span><span>৳${Math.max(0,lastInstallAmt).toLocaleString('en-IN')}</span></div>
+    </div>`;
+}
+
+function updateLastInstallment() { calcInstallmentPlan(); }
+
+function calcTargetAmount() {
+  const market = parseFloat(document.getElementById('inv-market-price').value)||0;
+  const pct = parseFloat(document.getElementById('inv-profit-pct').value)||0;
+  if(!market) return;
+  const profitAmt = market * (pct/100);
+  const target = Math.round(market + profitAmt);
+  document.getElementById('inv-target').value = target;
+  const bd = document.getElementById('price-breakdown');
+  if(bd) bd.innerHTML = `বাজারমূল্য ${fmt(market)} + ${pct}% = <strong style="color:var(--gold);">${fmt(target)}</strong>`;
+  calcInstallmentSuggestion();
+}
+
+function calcInstallmentSuggestion() {
+  const target = parseFloat(document.getElementById('inv-target').value)||0;
+  const advance = parseFloat(document.getElementById('inv-advance').value)||0;
+  const count = parseInt(document.getElementById('inv-inst-count').value)||0;
+  const el = document.getElementById('inst-suggestion');
+  if(!target||!count){if(el)el.style.display='none';return;}
+  const remaining = target - advance;
+  const suggested = Math.ceil(remaining/count);
+  if(document.getElementById('inst-suggest-amt')) document.getElementById('inst-suggest-amt').textContent = fmt(suggested);
+  if(document.getElementById('inv-inst-amt')) document.getElementById('inv-inst-amt').value = suggested;
+  if(el) el.style.display = 'block';
+  updateLastInstallment();
+}
+
+function updateLastInstallment() {
+  const target = parseFloat(document.getElementById('inv-target').value)||0;
+  const advance = parseFloat(document.getElementById('inv-advance').value)||0;
+  const count = parseInt(document.getElementById('inv-inst-count').value)||0;
+  const instAmt = parseFloat(document.getElementById('inv-inst-amt')?.value)||0;
+  const lastNote = document.getElementById('last-inst-note');
+  if(!target||!count||!instAmt) return;
+  const remaining = target - advance;
+  const lastInst = remaining - instAmt*(count-1);
+  if(lastNote) lastNote.textContent = `শেষ কিস্তি হবে: ${fmt(Math.max(0,lastInst))}`;
+}
+
+function generateInstallmentDates(firstDate, count, type) {
+  const dates = [];
+  let current = new Date(firstDate);
+  for(let i=0;i<count;i++) {
+    dates.push(current.toISOString().slice(0,10));
+    if(type==='monthly') current.setMonth(current.getMonth()+1);
+    else if(type==='weekly') current.setDate(current.getDate()+7);
+    else current.setMonth(current.getMonth()+1); // default monthly
+  }
+  return dates;
+}
+
+async function saveInvestment() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const name=document.getElementById('inv-name').value.trim();
+  const date=document.getElementById('inv-date').value;
+  const amount=parseFloat(document.getElementById('inv-amount').value)||0;
+  const advance=parseFloat(document.getElementById('inv-advance').value)||0;
+  const advanceDate=document.getElementById('inv-advance-date').value;
+  const installCount=parseInt(document.getElementById('inv-installment-count').value)||0;
+  const firstDate=document.getElementById('inv-first-date').value;
+  const installType=document.getElementById('inv-installment-type').value;
+  const installAmt=parseFloat(document.getElementById('inv-installment-amt').value)||0;
+  const note=document.getElementById('inv-note').value;
+  
+  if(!name||!date||!amount){showToast('❌ নাম, তারিখ ও পরিমাণ দিন');return;}
+  const s=calcStats();
+  if(amount>s.cashBalance){showToast('⚠️ পর্যাপ্ত নগদ নেই!');return;}
+  
+  const id='inv_'+Date.now();
+  const remaining=amount-advance;
+  const perInstallment=installAmt>0?installAmt:Math.ceil(remaining/(installCount||1));
+  
+  // Generate installment schedule
+  let installments=[];
+  if(installCount>0 && firstDate) {
+    const dates=generateInstallmentDates(firstDate,installCount,installType);
+    for(let i=0;i<installCount;i++) {
+      const isLast=(i===installCount-1);
+      const amt=isLast?Math.max(0,remaining-(perInstallment*(installCount-1))):perInstallment;
+      installments.push({
+        num:i+1, expectedDate:dates[i], amount:amt,
+        status:'pending', paidDate:null, paidAmount:null
+      });
+    }
+  }
+  
+  await fbWrite(`ucdata/investments/${id}`,{
+    id,name,date,amount,
+    advanceAmount:advance,advanceDate:advanceDate||null,advanceRecovered:advance>0,
+    installments,installCount,perInstallment,
+    loss:0,status:'Running',note,
+    createdAt:new Date().toISOString()
+  });
+  
+  showToast('✅ বিনিয়োগ যোগ হয়েছে!');
+  ['inv-name','inv-note','inv-advance','inv-advance-date','inv-installment-count','inv-first-date','inv-installment-amt'].forEach(i=>{
+    const el=document.getElementById(i); if(el) el.value='';
+  });
+  ['inv-date','inv-amount'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('installment-preview').innerHTML='';
+}
+
+async function markCompleted(id) {
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${id}`),{status:'Completed'});
+  showToast('✅ সমাপ্ত চিহ্নিত!');
+}
+
+function populateRecoveryDropdown() {
+  const d=loadData();
+  const sel=document.getElementById('rec-inv');
+  const running=d.investments.filter(i=>i.status==='Running');
+  sel.innerHTML=running.length?running.map(i=>`<option value="${i.id}">${i.name} (${fmt(i.amount)})</option>`):'<option>চলমান বিনিয়োগ নেই</option>';
+  document.getElementById('rec-date').value=new Date().toISOString().slice(0,10);
+  if(running.length) loadInstallmentList();
+}
+
+function loadInstallmentList() {
+  const d=loadData();
+  const invId=document.getElementById('rec-inv').value;
+  if(!invId) return;
+  const inv=d.investments.find(i=>i.id===invId);
+  const section=document.getElementById('rec-installment-section');
+  const listEl=document.getElementById('installment-list-view');
+  const sel=document.getElementById('rec-installment-sel');
+  if(!section||!sel) return;
+
+  if(!inv||!inv.installments||!inv.installments.length) {
+    section.style.display='none';
+    if(listEl) listEl.innerHTML='<div class="empty"><div class="e-icon">📋</div>কোনো কিস্তি নেই</div>';
+    return;
+  }
+  section.style.display='block';
+
+  const today=new Date().toISOString().slice(0,10);
+  const sevenDays=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const insts=inv.installments||[];
+
+  // Sort: overdue first, then upcoming, then future, then paid
+  const sorted=[...insts].sort((a,b)=>{
+    const aPaid=a.status==='paid'; const bPaid=b.status==='paid';
+    if(aPaid&&!bPaid) return 1; if(!aPaid&&bPaid) return -1;
+    return a.dueDate>b.dueDate?1:-1;
+  });
+
+  // Dropdown - unpaid only
+  const unpaid=sorted.filter(i=>i.status!=='paid');
+  sel.innerHTML='<option value="">-- কিস্তি বেছে নিন --</option>'+
+    unpaid.map(i=>{
+      const isOverdue=i.dueDate<today;
+      const isUpcoming=i.dueDate>=today&&i.dueDate<=sevenDays;
+      const icon=isOverdue?'⚠️':isUpcoming?'🔔':'⏳';
+      return `<option value="${i.no}">${icon} কিস্তি ${i.no} — ${i.dueDate} — ${fmt(i.amount)}</option>`;
+    }).join('');
+
+  // Auto select first unpaid
+  if(unpaid.length) { sel.value=unpaid[0].no; onInstallmentSelect(); }
+
+  // Render full list
+  if(!listEl) return;
+  const totalRec=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.amount||r.principal||0),0);
+  const advance=inv.advance||0;
+
+  listEl.innerHTML=`
+    <div class="card" style="margin-bottom:10px;">
+      <div class="list-row"><span>ক্রয়মূল্য</span><span>${fmt(inv.amount)}</span></div>
+      <div class="list-row"><span>আদায় লক্ষ্য</span><span style="color:var(--gold);">${fmt(inv.target||inv.amount)}</span></div>
+      ${advance>0?`<div class="list-row"><span>অগ্রিম আদায়</span><span style="color:var(--green);">✅ ${fmt(advance)}</span></div>`:''}
+      <div class="list-row"><span>মোট আদায়</span><span style="color:var(--blue);">${fmt(totalRec)}</span></div>
+      <div class="list-row"><span>বাকি</span><span style="color:var(--orange);">${fmt(Math.max(0,(inv.target||inv.amount)-totalRec))}</span></div>
+    </div>`+
+    sorted.map(inst=>{
+      const isPaid=inst.status==='paid';
+      const isOverdue=!isPaid&&inst.dueDate<today;
+      const isUpcoming=!isPaid&&inst.dueDate>=today&&inst.dueDate<=sevenDays;
+      const color=isPaid?'var(--green)':isOverdue?'var(--red)':isUpcoming?'var(--orange)':'var(--blue)';
+      const label=isPaid?'✅ আদায়':isOverdue?'⚠️ বকেয়া':isUpcoming?'🔔 আসছে':'⏳ বাকি';
+      return `<div class="list-item" style="border-left:3px solid ${color};">
+        <div class="list-header">
+          <div class="list-name">কিস্তি ${inst.no}</div>
+          <div class="badge" style="background:${color}22;color:${color};">${label}</div>
+        </div>
+        <div class="list-row"><span>নির্ধারিত তারিখ</span><span>${inst.dueDate}</span></div>
+        <div class="list-row"><span>পরিমাণ</span><span>${fmt(inst.amount)}</span></div>
+        ${isPaid?`<div class="list-row"><span>আদায়ের তারিখ</span><span style="color:var(--green);">${inst.paidDate||'—'}</span></div>`:''}
+        ${isPaid?`<div class="list-row"><span>আদায় হয়েছে</span><span style="color:var(--green);">${fmt(inst.paidAmount||inst.amount)}</span></div>`:''}
+        ${currentRole==='editor'?`<div class="action-row">
+          <button class="btn-edit" onclick="editInstallment('${invId}',${inst.no})">✏️ এডিট</button>
+          ${isPaid?`<button class="btn-del" onclick="deleteInstallmentPayment('${invId}',${inst.no})">🗑️ আদায় বাতিল</button>`:''}
+        </div>`:''}
+      </div>`;
+    }).join('');
+}
+
+
+function onInstallmentSelect() {
+  const d=loadData();
+  const invId=document.getElementById('rec-inv').value;
+  const inv=d.investments.find(i=>i.id===invId);
+  const idx=document.getElementById('rec-installment-sel').value;
+  if(!inv||idx==='') return;
+  const inst=inv.installments[parseInt(idx)];
+  document.getElementById('rec-amount').value=inst.amount;
+  calcRecoveryBreakdown();
+}
+
+function calcRecoveryBreakdown() {
+  const d=loadData();
+  const invId=document.getElementById('rec-inv').value;
+  const inv=d.investments.find(i=>i.id===invId);
+  const amount=parseFloat(document.getElementById('rec-amount').value)||0;
+  const el=document.getElementById('rec-breakdown');
+  if(!inv||!amount){if(el)el.innerHTML='';return;}
+
+  // Already recovered (all recoveries for this investment)
+  const alreadyRec=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.amount||r.principal||0),0);
+  const cost=inv.amount||0;
+  const target=inv.target||cost;
+
+  // Principal vs Profit split (based on cost)
+  const principalPart=Math.min(amount, Math.max(0, cost-alreadyRec));
+  const profitPart=amount-principalPart;
+
+  if(el) el.innerHTML=`
+    <div class="card" style="background:var(--navy3);">
+      <div class="list-row"><span>ক্রয়মূল্য</span><span>${fmt(cost)}</span></div>
+      <div class="list-row"><span>আগে আদায়</span><span>${fmt(alreadyRec)}</span></div>
+      <div class="list-row"><span>এই কিস্তিতে</span><span style="color:var(--gold);">${fmt(amount)}</span></div>
+      <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
+      <div class="list-row"><span>মূল অংশ</span><span style="color:var(--blue);">${fmt(principalPart)}</span></div>
+      <div class="list-row"><span>লাভের অংশ</span><span style="color:var(--green);">${fmt(profitPart)}</span></div>
+      ${profitPart>0?`<div style="font-size:10px;color:var(--green);margin-top:4px;">✅ ক্রয়মূল্য উঠে গেছে — এটা লাভ!</div>`:''}
+    </div>`;
+}
+
+
+function checkRecovery() { calcRecoveryBreakdown(); }
+
+async function saveRecovery() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const invId=document.getElementById('rec-inv').value;
+  const date=document.getElementById('rec-date').value;
+  const amount=parseFloat(document.getElementById('rec-amount').value)||0;
+  const instIdx=document.getElementById('rec-installment-sel').value;
+  if(!invId||!date||!amount){showToast('❌ তথ্য দিন');return;}
+  
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  
+  // Calculate principal vs profit
+  const alreadyRecovered=d.recoveries.filter(r=>r.invId===invId).reduce((s,r)=>s+(r.principal||0),0)+(inv.advanceRecovered?inv.advanceAmount||0:0);
+  const principalPart=Math.min(amount,Math.max(0,inv.amount-alreadyRecovered));
+  const profitPart=amount-principalPart;
+  
+  const id='rec_'+Date.now();
+  await fbWrite(`ucdata/recoveries/${id}`,{
+    id,invId,date,principal:principalPart,profit:profitPart,
+    totalAmount:amount,installmentNum:instIdx!==''?parseInt(instIdx)+1:null,
+    createdAt:new Date().toISOString()
+  });
+  
+  // Update installment status if selected
+  if(instIdx!=='' && inv.installments && inv.installments.length) {
+    const updatedInstallments=[...inv.installments];
+    updatedInstallments[parseInt(instIdx)]={...updatedInstallments[parseInt(instIdx)],status:'paid',paidDate:date,paidAmount:amount};
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInstallments});
+  }
+  
+  // Check if fully recovered
+  const newTotalRec=alreadyRecovered+principalPart;
+  if(newTotalRec>=inv.amount) {
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{status:'Completed'});
+  }
+  
+  showToast(`✅ আদায় সেভ! মূল: ${fmt(principalPart)}, লাভ: ${fmt(profitPart)}`);
+  document.getElementById('rec-amount').value='';
+  document.getElementById('rec-breakdown').innerHTML='';
+  document.getElementById('rec-installment-sel').value='';
+}
+
+// ══════════════════════════════
+// EXPENSES
+// ══════════════════════════════
+async function saveExpense() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const date=document.getElementById('exp-date').value;
+  const cat=document.getElementById('exp-cat').value;
+  const amount=parseFloat(document.getElementById('exp-amount').value)||0;
+  const note=document.getElementById('exp-note').value;
+  if(!date||!amount){showToast('❌ তারিখ ও পরিমাণ দিন');return;}
+  const id='exp_'+Date.now();
+  await fbWrite(`ucdata/expenses/${id}`,{id,date,category:cat,amount,note,createdAt:new Date().toISOString()});
+  showToast('✅ খরচ সেভ হয়েছে!');
+  document.getElementById('exp-amount').value='';
+  document.getElementById('exp-note').value='';
+}
+
+function renderExpenseList() {
+  const d=loadData();
+  const el=document.getElementById('expense-list');
+  if(!el) return;
+  if(!d.expenses.length){el.innerHTML='<div class="empty"><div class="e-icon">💸</div>কোনো খরচ নেই</div>';return;}
+  const total=d.expenses.reduce((s,e)=>s+(e.amount||0),0);
+  el.innerHTML=`<div class="total-box" style="margin-bottom:11px;"><span>মোট খরচ:</span><span>${fmt(total)}</span></div>`+
+  [...d.expenses].sort((a,b)=>b.createdAt>a.createdAt?1:-1).map(exp=>`
+    <div class="list-item">
+      <div class="list-header">
+        <div><div class="list-name">${exp.category}</div><div style="font-size:11px;color:var(--text2);">${exp.date}${exp.note?' · '+exp.note:''}</div></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--orange);">${fmt(exp.amount)}</div>
+      </div>
+      ${currentRole==='editor'?`<div class="action-row"><button class="btn-edit" onclick="editExpense('${exp.id}')">✏️ এডিট</button><button class="btn-del" onclick="deleteExpense('${exp.id}')">🗑️</button></div>`:''}
+    </div>`).join('');
+}
+
+function editExpense(id) {
+  const d=loadData();
+  const exp=d.expenses.find(x=>x.id===id);
+  if(!exp) return;
+  document.getElementById('edit-modal-title').textContent='খরচ এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>তারিখ</label><input type="date" id="e-exp-date" value="${exp.date}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-exp-amount" value="${exp.amount}"></div>
+      <div class="form-group"><label>নোট</label><input type="text" id="e-exp-note" value="${exp.note||''}"></div>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-gold" onclick="saveEditExpense('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteExpense('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditExpense(id) {
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/expenses/${id}`),{
+    date:document.getElementById('e-exp-date').value,
+    amount:parseFloat(document.getElementById('e-exp-amount').value)||0,
+    note:document.getElementById('e-exp-note').value
+  });
+  closeModal();showToast('✅ আপডেট হয়েছে!');
+}
+
+async function deleteExpense(id) {
+  if(!confirm('এই খরচ Trash এ পাঠাবেন?')) return;
+  await moveToTrash('expenses', id);
+  closeModal();showToast('🗑️ Trash এ পাঠানো হয়েছে');
+}
+
+// ══════════════════════════════
+// MEMBERS
+// ══════════════════════════════
+function renderMembersPage() {
+  const d=loadData();
+  const chips=document.getElementById('member-chips');
+  if(chips){
+    chips.innerHTML=d.members.map((m,i)=>`<div class="mem-chip${i===0?' active':''}" onclick="selectMember('${m.id}',this)"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--gold);display:block;">${m.ucCode||''}</span>${m.name}</div>`).join('');
+    if(d.members.length){selectedMemberId=d.members[0].id;renderMemberProfile();}
+  }
+  // Transfer dropdowns
+  const tf=document.getElementById('transfer-from');
+  const tt=document.getElementById('transfer-to');
+  const em=document.getElementById('exit-member');
+  const active=d.members.filter(m=>m.status==='Active');
+  if(tf) tf.innerHTML=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  if(tt) tt.innerHTML=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  if(em){ em.innerHTML=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); showExitPreview(); }
+  // Populate buyer selects
+  populateBuyerSelects();
+  renderTransferHistory();
+}
+
+function populateBuyerSelects() {
+  const d=loadData();
+  const active=d.members.filter(m=>m.status==='Active');
+  const opts=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  document.querySelectorAll('.buyer-select').forEach(sel=>{ sel.innerHTML=opts; });
+}
+
+function addBuyerRow() {
+  const list=document.getElementById('buyers-list');
+  const idx=list.children.length;
+  const d=loadData();
+  const active=d.members.filter(m=>m.status==='Active');
+  const opts=active.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  const row=document.createElement('div');
+  row.className='form-row';
+  row.id=`buyer-row-${idx}`;
+  row.innerHTML=`
+    <div class="form-group"><label>ক্রেতা ${idx+1}</label><select class="buyer-select" data-idx="${idx}">${opts}</select></div>
+    <div class="form-group"><label>% পরিমাণ</label><input type="number" class="buyer-pct" data-idx="${idx}" placeholder="৫" step="0.01" oninput="previewTransfer()"></div>`;
+  list.appendChild(row);
+}
+
+function selectMember(id,el) {
+  selectedMemberId=id;
+  document.querySelectorAll('.mem-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderMemberProfile();
+}
+
+function renderMemberProfile() {
+  if(!selectedMemberId) return;
+  const d=loadData();
+  const m=d.members.find(x=>x.id===selectedMemberId);
+  if(!m) return;
+  const s=calcStats();
+  const principal=s.principalMap[m.id]||0;
+  const penalty=d.deposits.filter(dep=>dep.memberId===m.id).reduce((s,x)=>s+(x.duePenalty||0),0);
+  const ownership=s.ownership[m.id]||0;
+  const currentVal=s.totalAssets*ownership;
+  const canExit=s.cashBalance>=currentVal;
+  const deposits=d.deposits.filter(dep=>dep.memberId===m.id).sort((a,b)=>b.createdAt>a.createdAt?1:-1);
+  document.getElementById('member-profile-content').innerHTML=`
+    <div class="card">
+      <div style="text-align:center;margin-bottom:13px;">
+        ${m.ucCode?`<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold);opacity:0.7;margin-bottom:3px;">${m.ucCode}</div>`:''}
+        <div style="font-size:17px;font-weight:700;color:var(--gold);">${m.name}</div>
+        <div style="font-size:11px;color:var(--text2);">যোগদান: ${m.joinDate} · ${m.status==='Active'?'✅ সক্রিয়':'❌ বের হয়েছেন'}</div>
+        ${currentRole==='editor'?`<div class="action-row" style="margin-top:10px;justify-content:center;">
+          <button class="btn-edit" onclick="editMember('${m.id}')">✏️ এডিট</button>
+          <button class="btn-del" onclick="deleteMember('${m.id}')">🗑️ মুছুন</button>
+        </div>`:''}
+      </div>
+      <div class="member-grid">
+        <div class="member-stat"><div class="ms-val">${fmt(principal)}</div><div class="ms-lbl">মূল জমা</div></div>
+        <div class="member-stat"><div class="ms-val">${fmt(penalty)}</div><div class="ms-lbl">জরিমানা</div></div>
+        <div class="member-stat"><div class="ms-val">${fmtPct(ownership)}</div><div class="ms-lbl">মালিকানা</div></div>
+        <div class="member-stat"><div class="ms-val">${fmt(currentVal)}</div><div class="ms-lbl">বর্তমান মূল্য</div></div>
+      </div>
+      <div class="total-box"><span>Exit মূল্য</span><span>${fmt(currentVal)}</span></div>
+      <div style="font-size:11px;color:${canExit?'var(--green)':'var(--red)'};margin-top:5px;">${canExit?'✅ পরিশোধ সম্ভব':'⏳ পর্যাপ্ত নগদ নেই'}</div>
+    </div>
+    <div class="sec-head">জমার ইতিহাস (${deposits.length} টি)</div>
+    <div class="card">
+      ${deposits.length?deposits.slice(0,10).map(dep=>`
+        <div class="hist-item">
+          <div><div style="font-size:12px;">${dep.month} · ${dep.depDate}</div>
+          ${dep.duePenalty>0?`<div style="font-size:10px;color:var(--red);">জরিমানা: ${fmt(dep.duePenalty)}</div>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--green);">${fmt(dep.total)}</span>
+            ${currentRole==='editor'?`<button onclick="editDeposit('${dep.id}')" style="background:var(--navy3);border:1px solid var(--border);color:var(--gold);border-radius:5px;padding:3px 7px;font-size:10px;cursor:pointer;">✏️</button>`:''}
+          </div>
+        </div>`).join(''):'<div style="color:var(--text2);font-size:12px;text-align:center;padding:10px;">জমা নেই</div>'}
+    </div>`;
+}
+
+// SHARE TRANSFER
+function previewTransfer() {
+  const fromId=document.getElementById('transfer-from')?.value;
+  if(!fromId) return;
+  const s=calcStats();
+  const d=loadData();
+  const fromName=d.members.find(m=>m.id===fromId)?.name||'?';
+  const fromOwn=(s.ownership[fromId]||0)*100;
+  // Get all buyers
+  const buyers=[];
+  document.querySelectorAll('.buyer-pct').forEach(inp=>{
+    const idx=inp.dataset.idx;
+    const sel=document.querySelector(`.buyer-select[data-idx="${idx}"]`);
+    const pct=parseFloat(inp.value)||0;
+    if(sel && pct>0) buyers.push({id:sel.value, name:d.members.find(m=>m.id===sel.value)?.name||'?', pct});
+  });
+  const totalPct=buyers.reduce((s,b)=>s+b.pct,0);
+  const value=s.totalAssets*(totalPct/100);
+  let rows=buyers.map(b=>`<div class="list-row"><span>${b.name}</span><span style="color:var(--green);">+${b.pct}%</span></div>`).join('');
+  document.getElementById('transfer-preview').innerHTML=`
+    <div class="card" style="background:var(--navy3);">
+      <div class="list-row"><span>${fromName} এর মালিকানা</span><span>${fromOwn.toFixed(2)}%</span></div>
+      <div class="list-row"><span>মোট ট্রান্সফার</span><span style="color:var(--red);">-${totalPct}%</span></div>
+      ${rows}
+      <div class="list-row"><span>আনুমানিক মূল্য</span><span>${fmt(value)}</span></div>
+    </div>`;
+}
+
+async function doShareTransfer() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const fromId=document.getElementById('transfer-from').value;
+  const d=loadData();
+  const s=calcStats();
+  const fromMem=d.members.find(m=>m.id===fromId);
+  // Get all buyers
+  const buyers=[];
+  document.querySelectorAll('.buyer-pct').forEach(inp=>{
+    const idx=inp.dataset.idx;
+    const sel=document.querySelector(`.buyer-select[data-idx="${idx}"]`);
+    const pct=parseFloat(inp.value)||0;
+    if(sel && pct>0) buyers.push({id:sel.value,pct});
+  });
+  if(!buyers.length){showToast('❌ ক্রেতা ও % দিন');return;}
+  const totalPct=buyers.reduce((s,b)=>s+b.pct,0);
+  if((s.ownership[fromId]||0)*100<totalPct){showToast('❌ এত বেশি শেয়ার নেই');return;}
+  if(buyers.some(b=>b.id===fromId)){showToast('❌ বিক্রেতা ক্রেতা হতে পারবে না');return;}
+  if(!confirm(`মোট ${totalPct}% শেয়ার ট্রান্সফার নিশ্চিত করুন?`)) return;
+  // Update seller
+  const fromExtra=(parseFloat(fromMem.extraShares)||0)-totalPct;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${fromId}`),{extraShares:fromExtra});
+  // Update each buyer
+  const buyerNames=[];
+  for(const b of buyers){
+    const bMem=d.members.find(m=>m.id===b.id);
+    const bExtra=(parseFloat(bMem.extraShares)||0)+b.pct;
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${b.id}`),{extraShares:bExtra});
+    buyerNames.push(`${bMem.name}(${b.pct}%)`);
+  }
+  // Log transfer
+  const id='tr_'+Date.now();
+  await fbWrite(`ucdata/transfers/${id}`,{
+    id,fromId,fromName:fromMem.name,
+    buyers:buyers.map(b=>({id:b.id,name:d.members.find(m=>m.id===b.id)?.name,pct:b.pct})),
+    totalPct,date:new Date().toISOString().slice(0,10),createdAt:new Date().toISOString()
+  });
+  showToast(`✅ ${totalPct}% শেয়ার ট্রান্সফার সম্পন্ন!`);
+  // Reset form
+  document.querySelectorAll('.buyer-pct').forEach(inp=>inp.value='');
+  document.getElementById('transfer-preview').innerHTML='';
+  // Remove extra buyer rows
+  const list=document.getElementById('buyers-list');
+  while(list.children.length>1) list.removeChild(list.lastChild);
+}
+
+function renderTransferHistory() {
+  const d=loadData();
+  const el=document.getElementById('transfer-history');
+  if(!el) return;
+  if(!d.transfers.length){el.innerHTML='<div class="empty"><div class="e-icon">🔄</div>কোনো ট্রান্সফার নেই</div>';return;}
+  el.innerHTML=[...d.transfers].sort((a,b)=>b.createdAt>a.createdAt?1:-1).map(t=>{
+    // Support both old (single buyer) and new (multiple buyers) format
+    let buyerText='';
+    if(t.buyers && t.buyers.length) {
+      buyerText=t.buyers.map(b=>`${b.name}(${b.pct}%)`).join(', ');
+    } else {
+      buyerText=`${t.toName||'?'}(${t.pct}%)`;
+    }
+    return `<div class="list-item">
+      <div class="list-row"><span>${t.fromName} →</span><span style="color:var(--gold);">${t.totalPct||t.pct}% মোট</span></div>
+      <div style="font-size:11px;color:var(--text2);margin:3px 0;">ক্রেতা: ${buyerText}</div>
+      <div class="list-row" style="font-size:10px;"><span>তারিখ</span><span>${t.date}</span></div>
+      ${currentRole==='editor'?`<div class="action-row"><button class="btn-edit" onclick="editTransfer('${t.id}')">✏️ এডিট</button><button class="btn-del" onclick="deleteTransfer('${t.id}')">🗑️</button></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function editTransfer(id) {
+  const d=loadData();
+  const t=d.transfers.find(x=>x.id===id);
+  if(!t) return;
+  document.getElementById('edit-modal-title').textContent='ট্রান্সফার এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>তারিখ</label><input type="date" id="e-tr-date" value="${t.date}"></div>
+    <div style="background:var(--navy3);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--text2);">
+      বিক্রেতা: <strong style="color:var(--gold);">${t.fromName}</strong><br>
+      মোট: <strong style="color:var(--red);">${t.totalPct||t.pct}%</strong>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-gold" onclick="saveEditTransfer('${id}')">✅ তারিখ আপডেট</button>
+      <button class="btn btn-red" onclick="deleteTransfer('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditTransfer(id) {
+  const date=document.getElementById('e-tr-date').value;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/transfers/${id}`),{date});
+  closeModal();showToast('✅ তারিখ আপডেট হয়েছে!');
+}
+
+async function deleteTransfer(id) {
+  const d=loadData();
+  const t=d.transfers.find(x=>x.id===id);
+  if(!t||!confirm('এই ট্রান্সফার Trash এ পাঠাবেন?\n⚠️ শেয়ার % ফেরত যাবে না!')) return;
+  await moveToTrash(`ucdata/transfers/${id}`,'ট্রান্সফার',`${t.fromName} → ${t.totalPct||t.pct}%`);
+  closeModal();
+}
+
+async function addMember() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const ucCode=document.getElementById('new-mem-code').value.trim().toUpperCase();
+  const name=document.getElementById('new-mem-name').value.trim();
+  const date=document.getElementById('new-mem-date').value;
+  if(!ucCode||!name||!date){showToast('❌ কোড, নাম ও তারিখ দিন');return;}
+  // Check duplicate code
+  const d=loadData();
+  if(d.members.some(m=>m.ucCode===ucCode)){showToast('❌ এই কোড আগেই আছে!');return;}
+  const id='M_'+Date.now();
+  await fbWrite(`ucdata/members/${id}`,{id,ucCode,name,joinDate:date,status:'Active',extraShares:0});
+  showToast('✅ সদস্য যোগ হয়েছে!');
+  document.getElementById('new-mem-code').value='';
+  document.getElementById('new-mem-name').value='';
+  document.getElementById('new-mem-date').value='';
+}
+
+function memTab(name,el) {
+  document.querySelectorAll('#page-members .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['profile','transfer','add','exit'].forEach(n=>document.getElementById('mem-'+n+'-panel').style.display=n===name?'block':'none');
+  if(name==='exit'){showExitPreview();renderExitedMembers();}
+  if(name==='transfer') renderTransferHistory();
+}
+
+function editMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  if(!m) return;
+  document.getElementById('edit-modal-title').textContent='সদস্য এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-row">
+      <div class="form-group"><label>ইউনিক কোড</label><input type="text" id="e-mem-code" value="${m.ucCode||''}" style="font-family:'IBM Plex Mono',monospace;" placeholder="UCM01"></div>
+      <div class="form-group"><label>সদস্যের নাম</label><input type="text" id="e-mem-name" value="${m.name}"></div>
+    </div>
+    <div class="form-group"><label>যোগদানের তারিখ</label><input type="date" id="e-mem-date" value="${m.joinDate}"></div>
+    <div class="form-group"><label>স্ট্যাটাস</label>
+      <select id="e-mem-status">
+        <option value="Active" ${m.status==='Active'?'selected':''}>✅ সক্রিয়</option>
+        <option value="Exited" ${m.status==='Exited'?'selected':''}>❌ বের হয়েছেন</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditMember('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteMember('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditMember(id) {
+  const ucCode=document.getElementById('e-mem-code').value.trim().toUpperCase();
+  const name=document.getElementById('e-mem-name').value.trim();
+  const joinDate=document.getElementById('e-mem-date').value;
+  const status=document.getElementById('e-mem-status').value;
+  if(!name){showToast('❌ নাম দিন');return;}
+  // Check duplicate code (excluding self)
+  const d=loadData();
+  if(ucCode && d.members.some(m=>m.ucCode===ucCode && m.id!==id)){
+    showToast('❌ এই কোড আগেই আছে!');return;
+  }
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{ucCode,name,joinDate,status});
+  closeModal();showToast('✅ সদস্য আপডেট হয়েছে!');
+}
+
+async function deleteMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  if(!m) return;
+  const hasDeposits=d.deposits.filter(dep=>!dep.deletedAt).some(dep=>dep.memberId===id);
+  if(hasDeposits){showToast('❌ জমা আছে — শুধু নাম এডিট করা যাবে');closeModal();return;}
+  if(!confirm(`"${m.name}" কে মুছে ফেলবেন?`)) return;
+  await fbDelete(`ucdata/members/${id}`);
+  selectedMemberId=null;
+  closeModal();showToast('🗑️ সদস্য মুছে ফেলা হয়েছে');
+}
+
+function renderInstallmentSchedule() {
+  const d=loadData();
+  const el=document.getElementById('inv-schedule-content');
+  if(!el) return;
+  
+  const today=new Date().toISOString().slice(0,10);
+  const allInsts=[];
+  
+  d.investments.filter(i=>i.status==='Running').forEach(inv=>{
+    if(inv.installments && inv.installments.length>0) {
+      const recs=d.recoveries.filter(r=>r.invId===inv.id);
+      const totalRec=recs.reduce((s,r)=>s+(r.principal||0)+(r.advance||0),0);
+      inv.installments.forEach(inst=>{
+        allInsts.push({...inst, invName:inv.name, invId:inv.id, totalRec, invAmount:inv.amount});
+      });
+    }
+  });
+  
+  if(!allInsts.length) {
+    el.innerHTML='<div class="empty"><div class="e-icon">📅</div>কোনো কিস্তি সময়সূচী নেই<br><div style="font-size:11px;margin-top:6px;">বিনিয়োগ যোগ করার সময় কিস্তি সংখ্যা দিন</div></div>';
+    return;
+  }
+  
+  // Sort: overdue > upcoming 7 days > future > paid
+  const overdue=allInsts.filter(i=>i.status==='pending'&&i.dueDate<today);
+  const upcoming=allInsts.filter(i=>{
+    const diff=(new Date(i.dueDate)-new Date())/86400000;
+    return i.status==='pending'&&i.dueDate>=today&&diff<=7;
+  });
+  const future=allInsts.filter(i=>{
+    const diff=(new Date(i.dueDate)-new Date())/86400000;
+    return i.status==='pending'&&i.dueDate>=today&&diff>7;
+  });
+  const paid=allInsts.filter(i=>i.status==='paid');
+  
+  const renderInst=(inst,type)=>{
+    const color=type==='overdue'?'var(--red)':type==='upcoming'?'var(--gold)':type==='paid'?'var(--green)':'var(--blue)';
+    const icon=type==='overdue'?'⚠️':type==='upcoming'?'🔔':type==='paid'?'✅':'⏳';
+    const diff=Math.ceil((new Date(inst.dueDate)-new Date())/86400000);
+    return `<div class="list-item" style="border-left:3px solid ${color};">
+      <div class="list-header">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:${color};">${icon} ${inst.num}নং কিস্তি · ${inst.invName}</div>
+          <div style="font-size:10px;color:var(--text2);">
+            ${inst.dueDate}
+            ${type==='overdue'?` · <span style="color:var(--red);">${Math.abs(diff)} দিন আগে!</span>`:''}
+            ${type==='upcoming'?` · <span style="color:var(--gold);">${diff} দিন বাকি</span>`:''}
+            ${type==='paid'?` · আদায়: ${inst.paidDate}`:''}
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:${color};">${fmt(inst.status==='paid'?inst.paidAmount:inst.amount)}</div>
+      </div>
+    </div>`;
+  };
+  
+  let html='';
+  if(overdue.length) html+=`<div class="sec-head" style="color:var(--red);">⚠️ মেয়াদ পেরিয়েছে (${overdue.length}টি)</div>`+overdue.map(i=>renderInst(i,'overdue')).join('');
+  if(upcoming.length) html+=`<div class="sec-head" style="color:var(--gold);">🔔 আসছে ৭ দিনের মধ্যে (${upcoming.length}টি)</div>`+upcoming.map(i=>renderInst(i,'upcoming')).join('');
+  if(future.length) html+=`<div class="sec-head">⏳ ভবিষ্যৎ কিস্তি (${future.length}টি)</div>`+future.map(i=>renderInst(i,'future')).join('');
+  if(paid.length) html+=`<div class="sec-head" style="color:var(--green);">✅ আদায় হয়েছে (${paid.length}টি)</div>`+paid.map(i=>renderInst(i,'paid')).join('');
+  
+  el.innerHTML=html;
+}
+
+function showExitPreview() {
+  const id=document.getElementById('exit-member')?.value;
+  if(!id) return;
+  const s=calcStats();
+  const d=loadData();
+  const own=s.ownership[id]||0;
+  const exitVal=s.totalAssets*own;
+  const canExit=s.cashBalance>=exitVal;
+  document.getElementById('exit-preview').innerHTML=`
+    <div class="card" style="background:var(--navy3);">
+      <div class="list-row"><span>মালিকানা</span><span>${fmtPct(own)}</span></div>
+      <div class="list-row"><span>Exit মূল্য</span><span style="color:var(--gold);">${fmt(exitVal)}</span></div>
+      <div class="list-row"><span>হাতে নগদ</span><span>${fmt(s.cashBalance)}</span></div>
+      <div style="font-size:11px;color:${canExit?'var(--green)':'var(--red)'};margin-top:7px;font-weight:700;">${canExit?'✅ পরিশোধ সম্ভব':'⏳ পর্যাপ্ত নগদ নেই'}</div>
+    </div>`;
+}
+
+async function processMemberExit() {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const d=loadData();
+  const id=document.getElementById('exit-member').value;
+  const m=d.members.find(x=>x.id===id);
+  if(!m||!confirm(m.name+'-কে Exit করাতে চান?')) return;
+  const exitDate=new Date().toISOString().slice(0,10);
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{status:'Exited',exitDate});
+  showToast('✅ Exit সম্পন্ন');
+  renderExitedMembers();
+}
+
+function renderExitedMembers() {
+  const d=loadData();
+  const el=document.getElementById('exited-members-list');
+  if(!el) return;
+  const exited=d.members.filter(m=>m.status==='Exited');
+  if(!exited.length){el.innerHTML='<div class="empty"><div class="e-icon">🚪</div>কোনো সদস্য exit করেননি</div>';return;}
+  el.innerHTML=exited.map(m=>`
+    <div class="list-item">
+      <div class="list-header">
+        <div class="list-name">${m.name}</div>
+        <div class="badge" style="background:var(--red-dim);color:var(--red);">Exit</div>
+      </div>
+      <div class="list-row"><span>যোগদান</span><span>${m.joinDate}</span></div>
+      <div class="list-row"><span>Exit তারিখ</span><span>${m.exitDate||'—'}</span></div>
+      ${currentRole==='editor'?`<div class="action-row">
+        <button class="btn-edit" onclick="editExitedMember('${m.id}')">✏️ এডিট</button>
+        <button class="btn-complete" onclick="reactivateMember('${m.id}')">↩️ ফিরিয়ে আনুন</button>
+      </div>`:''}
+    </div>`).join('');
+}
+
+function editExitedMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  if(!m) return;
+  document.getElementById('edit-modal-title').textContent='Exit সদস্য এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নাম</label><input type="text" id="e-exit-name" value="${m.name}"></div>
+    <div class="form-group"><label>Exit তারিখ</label><input type="date" id="e-exit-date" value="${m.exitDate||''}"></div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-gold" onclick="saveEditExitedMember('${id}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteExitedMember('${id}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditExitedMember(id) {
+  const name=document.getElementById('e-exit-name').value.trim();
+  const exitDate=document.getElementById('e-exit-date').value;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{name,exitDate});
+  closeModal();showToast('✅ আপডেট হয়েছে!');
+}
+
+async function deleteExitedMember(id) {
+  const d=loadData();
+  const m=d.members.find(x=>x.id===id);
+  const hasDeposits=d.deposits.some(dep=>dep.memberId===id);
+  if(hasDeposits){showToast('❌ জমা আছে — মুছা যাবে না');closeModal();return;}
+  if(!confirm(`"${m.name}" কে সম্পূর্ণ মুছবেন?`)) return;
+  await fbDelete(`ucdata/members/${id}`);
+  closeModal();showToast('🗑️ মুছে ফেলা হয়েছে');
+}
+
+async function reactivateMember(id) {
+  if(!confirm('এই সদস্যকে আবার সক্রিয় করবেন?')) return;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/members/${id}`),{status:'Active',exitDate:null});
+  showToast('✅ সদস্য আবার সক্রিয় হয়েছে!');
+}
+
+// ══════════════════════════════
+// BACKUP
+// ══════════════════════════════
+// ══════════════════════════════
+// INSTALLMENT EDIT/DELETE
+// ══════════════════════════════
+function editInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const inst=inv.installments.find(i=>i.no===instNo);
+  if(!inst) return;
+  document.getElementById('edit-modal-title').textContent=`কিস্তি ${instNo} এডিট`;
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নির্ধারিত তারিখ</label><input type="date" id="e-inst-date" value="${inst.dueDate}"></div>
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inst-amount" value="${inst.amount}"></div>
+    ${inst.status==='paid'?`
+    <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="e-inst-paid-date" value="${inst.paidDate||''}"></div>
+    <div class="form-group"><label>আদায়ের পরিমাণ (৳)</label><input type="number" id="e-inst-paid-amount" value="${inst.paidAmount||inst.amount}"></div>
+    `:''}
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditInstallment('${invId}',${instNo})">✅ সেভ</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const updatedInsts=inv.installments.map(i=>{
+    if(i.no!==instNo) return i;
+    const updated={...i,
+      dueDate:document.getElementById('e-inst-date').value,
+      amount:parseFloat(document.getElementById('e-inst-amount').value)||i.amount
+    };
+    if(i.status==='paid') {
+      updated.paidDate=document.getElementById('e-inst-paid-date')?.value||i.paidDate;
+      updated.paidAmount=parseFloat(document.getElementById('e-inst-paid-amount')?.value)||i.paidAmount;
+    }
+    return updated;
+  });
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts});
+  closeModal();showToast('✅ কিস্তি আপডেট হয়েছে!');
+  loadInstallmentList();
+}
+
+async function deleteInstallmentPayment(invId, instNo) {
+  if(!confirm('এই কিস্তির আদায় বাতিল করবেন?')) return;
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  // Reset installment to pending
+  const updatedInsts=inv.installments.map(i=>
+    i.no===instNo?{...i,status:'pending',paidDate:null,paidAmount:null}:i
+  );
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts,status:'Running'});
+  // Remove related recovery from trash
+  const relatedRec=d.recoveries.find(r=>r.invId===invId&&r.instNo===instNo);
+  if(relatedRec) await moveToTrash('recoveries',relatedRec.id,`কিস্তি ${instNo} আদায় বাতিল`);
+  showToast('🗑️ আদায় বাতিল হয়েছে');
+  loadInstallmentList();
+  renderDashboard();
+}
+
+// ══════════════════════════════
+// INSTALLMENT EDIT/DELETE
+// ══════════════════════════════
+function editInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const inst=inv.installments.find(i=>i.no===instNo);
+  if(!inst) return;
+  document.getElementById('edit-modal-title').textContent='কিস্তি '+instNo+' এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নির্ধারিত তারিখ</label><input type="date" id="e-inst-date" value="${inst.dueDate}"></div>
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inst-amount" value="${inst.amount}"></div>
+    ${inst.status==='paid'?`
+    <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="e-inst-paid-date" value="${inst.paidDate||''}"></div>
+    <div class="form-group"><label>আদায় পরিমাণ (৳)</label><input type="number" id="e-inst-paid-amt" value="${inst.paidAmount||inst.amount}"></div>
+    `:''}
+    <button class="btn btn-gold" style="margin-top:4px;" onclick="saveEditInstallment('${invId}',${instNo})">✅ সেভ</button>`;
+  openModal();
+}
+
+async function saveEditInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const updatedInsts=inv.installments.map(i=>{
+    if(i.no!==instNo) return i;
+    const u={...i,
+      dueDate:document.getElementById('e-inst-date').value,
+      amount:parseFloat(document.getElementById('e-inst-amount').value)||i.amount
+    };
+    if(i.status==='paid') {
+      const pd=document.getElementById('e-inst-paid-date');
+      const pa=document.getElementById('e-inst-paid-amt');
+      if(pd) u.paidDate=pd.value;
+      if(pa) u.paidAmount=parseFloat(pa.value)||i.paidAmount;
+    }
+    return u;
+  });
+  await fbUpdate(window.fbRef(window.fbDb,'ucdata/investments/'+invId),{installments:updatedInsts});
+  closeModal();showToast('✅ কিস্তি আপডেট!');
+  loadInstallmentList();
+}
+
+async function deleteInstallmentPayment(invId, instNo) {
+  if(!confirm('এই কিস্তির আদায় বাতিল করবেন?')) return;
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const updatedInsts=inv.installments.map(i=>
+    i.no===instNo?{...i,status:'pending',paidDate:null,paidAmount:null}:i
+  );
+  await fbUpdate(window.fbRef(window.fbDb,'ucdata/investments/'+invId),{installments:updatedInsts,status:'Running'});
+  const relatedRec=d.recoveries.find(r=>r.invId===invId&&r.installmentNum===instNo);
+  if(relatedRec) await moveToTrash('recoveries',relatedRec.id,'কিস্তি '+instNo+' আদায় বাতিল');
+  showToast('🗑️ আদায় বাতিল হয়েছে');
+  loadInstallmentList(); renderDashboard();
+}
+
+// ══════════════════════════════
+// TRASH SYSTEM
+// ══════════════════════════════
+async function moveToTrash(type, id) {
+  const deletedAt=new Date().toISOString();
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/${type}/${id}`),{deletedAt});
+}
+
+async function restoreFromTrash(type, id) {
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/${type}/${id}`),{deletedAt:null});
+  showToast('✅ Restore সম্পন্ন!');
+  renderTrashList();
+  renderCurrentPage();
+}
+
+async function permanentDelete(type, id) {
+  if(!confirm('স্থায়ীভাবে মুছবেন? পুনরুদ্ধার সম্ভব হবে না!')) return;
+  await fbDelete(`ucdata/${type}/${id}`);
+  showToast('🗑️ স্থায়ীভাবে মুছে ফেলা হয়েছে');
+  renderTrashList();
+}
+
+async function emptyTrash() {
+  if(!confirm('সব Trash স্থায়ীভাবে মুছবেন?')) return;
+  const d=loadData();
+  const types=['deposits','investments','recoveries','expenses','transfers'];
+  for(const type of types) {
+    const items=d[type]||[];
+    for(const item of items) {
+      if(item.deletedAt) await fbDelete(`ucdata/${type}/${item.id}`);
+    }
+  }
+  showToast('✅ Trash খালি করা হয়েছে!');
+  renderTrashList();
+}
+
+function renderTrashList() {
+  const el=document.getElementById('trash-list');
+  if(!el) return;
+  const d=loadData();
+  const now=new Date();
+  const items=[];
+  const typeLabels={deposits:'জমা',investments:'বিনিয়োগ',recoveries:'কিস্তি আদায়',expenses:'খরচ',transfers:'শেয়ার ট্রান্সফার'};
+  Object.entries(typeLabels).forEach(([type,label])=>{
+    (d[type]||[]).filter(i=>i.deletedAt).forEach(item=>{
+      const deletedDate=new Date(item.deletedAt);
+      const daysLeft=30-Math.floor((now-deletedDate)/(1000*86400));
+      items.push({type,label,item,daysLeft});
+    });
+  });
+  if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">🗑️</div>Trash খালি</div>';return;}
+  // Auto-permanently delete items older than 30 days
+  items.filter(i=>i.daysLeft<=0).forEach(async i=>{
+    await fbDelete(`ucdata/${i.type}/${i.item.id}`);
+  });
+  const active=items.filter(i=>i.daysLeft>0);
+  el.innerHTML=active.map(({type,label,item,daysLeft})=>{
+    const name=item.name||item.category||`${item.month||''} ${item.date||''}`||item.id;
+    return `<div class="list-item" style="border-left:3px solid var(--red);">
+      <div class="list-header">
+        <div><div class="list-name">${label}: ${name}</div>
+        <div style="font-size:10px;color:var(--red);">⏳ ${daysLeft} দিন বাকি</div></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2);">${item.amount||item.total||item.principal?fmt(item.amount||item.total||item.principal):''}</div>
+      </div>
+      <div class="action-row">
+        <button class="btn-edit" onclick="restoreFromTrash('${type}','${item.id}')">↩️ Restore</button>
+        <button class="btn-del" onclick="permanentDelete('${type}','${item.id}')">🗑️ মুছুন</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════
+// INSTALLMENT EDIT/DELETE
+// ══════════════════════════════
+function editInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const inst=inv.installments.find(i=>i.no===instNo);
+  if(!inst) return;
+  document.getElementById('edit-modal-title').textContent=`কিস্তি ${instNo} এডিট`;
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নির্ধারিত তারিখ</label><input type="date" id="e-inst-date" value="${inst.dueDate}"></div>
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inst-amount" value="${inst.amount}"></div>
+    ${inst.status==='paid'?`
+    <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="e-inst-paid-date" value="${inst.paidDate||''}"></div>
+    <div class="form-group"><label>আদায়ের পরিমাণ (৳)</label><input type="number" id="e-inst-paid-amount" value="${inst.paidAmount||inst.amount}"></div>
+    `:''}
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditInstallment('${invId}',${instNo})">✅ সেভ</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const updatedInsts=inv.installments.map(i=>{
+    if(i.no!==instNo) return i;
+    const updated={...i,
+      dueDate:document.getElementById('e-inst-date').value,
+      amount:parseFloat(document.getElementById('e-inst-amount').value)||i.amount
+    };
+    if(i.status==='paid') {
+      updated.paidDate=document.getElementById('e-inst-paid-date')?.value||i.paidDate;
+      updated.paidAmount=parseFloat(document.getElementById('e-inst-paid-amount')?.value)||i.paidAmount;
+    }
+    return updated;
+  });
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts});
+  closeModal();showToast('✅ কিস্তি আপডেট হয়েছে!');
+  loadInstallmentList();
+}
+
+async function deleteInstallmentPayment(invId, instNo) {
+  if(!confirm('এই কিস্তির আদায় বাতিল করবেন?')) return;
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  // Reset installment to pending
+  const updatedInsts=inv.installments.map(i=>
+    i.no===instNo?{...i,status:'pending',paidDate:null,paidAmount:null}:i
+  );
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts,status:'Running'});
+  // Remove related recovery from trash
+  const relatedRec=d.recoveries.find(r=>r.invId===invId&&r.instNo===instNo);
+  if(relatedRec) await moveToTrash('recoveries',relatedRec.id,`কিস্তি ${instNo} আদায় বাতিল`);
+  showToast('🗑️ আদায় বাতিল হয়েছে');
+  loadInstallmentList();
+  renderDashboard();
+}
+
+// ══════════════════════════════
+// TRASH SYSTEM
+// ══════════════════════════════
+async function moveToTrash(path, data, type, label) {
+  const trashId = 'trash_'+Date.now();
+  const deletedAt = new Date().toISOString();
+  const expireAt = new Date(Date.now()+30*24*60*60*1000).toISOString();
+  await fbWrite(`ucdata/trash/${trashId}`, {
+    id:trashId, originalPath:path, type, label,
+    data, deletedAt, expireAt
+  });
+  // Mark original as deleted
+  await fbUpdate(window.fbRef(window.fbDb, path), {deletedAt, trashId});
+  showToast(`🗑️ ${label} Trash এ গেছে (৩০ দিন)`);
+}
+
+async function restoreFromTrash(trashId) {
+  const d=loadData();
+  const item=d.trash&&d.trash.find(t=>t.id===trashId);
+  if(!item){showToast('❌ আইটেম পাওয়া যায়নি');return;}
+  // Remove deletedAt from original
+  await fbUpdate(window.fbRef(window.fbDb, item.originalPath), {deletedAt:null, trashId:null});
+  // Remove from trash
+  await fbDelete(`ucdata/trash/${trashId}`);
+  showToast('✅ Restore সম্পন্ন!');
+  renderTrashList();
+}
+
+async function permanentDelete(trashId) {
+  const d=loadData();
+  const item=d.trash&&d.trash.find(t=>t.id===trashId);
+  if(!item){showToast('❌ পাওয়া যায়নি');return;}
+  if(!confirm('স্থায়ীভাবে মুছবেন? Restore করা যাবে না!')) return;
+  // Delete original
+  await fbDelete(item.originalPath);
+  // Delete from trash
+  await fbDelete(`ucdata/trash/${trashId}`);
+  showToast('🗑️ স্থায়ীভাবে মুছে গেছে');
+  renderTrashList();
+}
+
+function renderTrashList() {
+  const el=document.getElementById('trash-list');
+  if(!el) return;
+  const d=loadData();
+  const trash=d.trash||[];
+  const now=new Date();
+  // Auto-expire check
+  const expired=trash.filter(t=>new Date(t.expireAt)<now);
+  expired.forEach(t=>permanentDeleteSilent(t.id));
+  const active=trash.filter(t=>new Date(t.expireAt)>=now);
+  if(!active.length){el.innerHTML='<div class="empty"><div class="e-icon">🗑️</div>Trash খালি</div>';return;}
+  el.innerHTML=active.sort((a,b)=>b.deletedAt>a.deletedAt?1:-1).map(t=>{
+    const daysLeft=Math.ceil((new Date(t.expireAt)-now)/(24*60*60*1000));
+    return `<div class="list-item" style="border-left:3px solid var(--red);">
+      <div class="list-header">
+        <div><div class="list-name">${t.label}</div><div style="font-size:10px;color:var(--text2);">${t.type} · ${t.deletedAt.slice(0,10)}</div></div>
+        <div style="font-size:10px;color:var(--red);">${daysLeft} দিন বাকি</div>
+      </div>
+      <div class="action-row">
+        <button class="btn-complete" onclick="restoreFromTrash('${t.id}')">↩️ Restore</button>
+        <button class="btn-del" onclick="permanentDelete('${t.id}')">🗑️ স্থায়ী মুছ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function permanentDeleteSilent(trashId) {
+  const d=loadData();
+  const item=d.trash&&d.trash.find(t=>t.id===trashId);
+  if(!item) return;
+  await fbDelete(item.originalPath);
+  await fbDelete(`ucdata/trash/${trashId}`);
+}
+
+// ══════════════════════════════
+// INSTALLMENT EDIT/DELETE
+// ══════════════════════════════
+function editInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const inst=inv.installments.find(i=>i.no===instNo);
+  if(!inst) return;
+  document.getElementById('edit-modal-title').textContent=`কিস্তি ${instNo} এডিট`;
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নির্ধারিত তারিখ</label><input type="date" id="e-inst-date" value="${inst.dueDate}"></div>
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inst-amount" value="${inst.amount}"></div>
+    ${inst.status==='paid'?`
+    <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="e-inst-paid-date" value="${inst.paidDate||''}"></div>
+    <div class="form-group"><label>আদায়ের পরিমাণ (৳)</label><input type="number" id="e-inst-paid-amount" value="${inst.paidAmount||inst.amount}"></div>
+    `:''}
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditInstallment('${invId}',${instNo})">✅ সেভ</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const updatedInsts=inv.installments.map(i=>{
+    if(i.no!==instNo) return i;
+    const updated={...i,
+      dueDate:document.getElementById('e-inst-date').value,
+      amount:parseFloat(document.getElementById('e-inst-amount').value)||i.amount
+    };
+    if(i.status==='paid') {
+      updated.paidDate=document.getElementById('e-inst-paid-date')?.value||i.paidDate;
+      updated.paidAmount=parseFloat(document.getElementById('e-inst-paid-amount')?.value)||i.paidAmount;
+    }
+    return updated;
+  });
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts});
+  closeModal();showToast('✅ কিস্তি আপডেট হয়েছে!');
+  loadInstallmentList();
+}
+
+async function deleteInstallmentPayment(invId, instNo) {
+  if(!confirm('এই কিস্তির আদায় বাতিল করবেন?')) return;
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  // Reset installment to pending
+  const updatedInsts=inv.installments.map(i=>
+    i.no===instNo?{...i,status:'pending',paidDate:null,paidAmount:null}:i
+  );
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts,status:'Running'});
+  // Remove related recovery from trash
+  const relatedRec=d.recoveries.find(r=>r.invId===invId&&r.instNo===instNo);
+  if(relatedRec) await moveToTrash('recoveries',relatedRec.id,`কিস্তি ${instNo} আদায় বাতিল`);
+  showToast('🗑️ আদায় বাতিল হয়েছে');
+  loadInstallmentList();
+  renderDashboard();
+}
+
+// ══════════════════════════════
+// TRASH SYSTEM
+// ══════════════════════════════
+async function moveToTrash(path, type, label) {
+  const trashId='trash_'+Date.now();
+  const deletedAt=new Date().toISOString();
+  const expireAt=new Date(Date.now()+30*24*60*60*1000).toISOString();
+  await fbWrite(`ucdata/trash/${trashId}`,{id:trashId,originalPath:path,type,label,deletedAt,expireAt});
+  await fbUpdate(window.fbRef(window.fbDb,path),{deletedAt,trashId});
+  showToast(`🗑️ ${label} Trash এ গেছে (৩০ দিন)`);
+}
+
+async function restoreFromTrash(trashId) {
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/trash/${trashId}/originalPath`),{});
+  const d=loadData();
+  const item=d.trash&&Object.values(d.trash||{}).find(t=>t.id===trashId);
+  if(!item){showToast('❌ পাওয়া যায়নি');return;}
+  await fbUpdate(window.fbRef(window.fbDb,item.originalPath),{deletedAt:null,trashId:null});
+  await fbDelete(`ucdata/trash/${trashId}`);
+  showToast('✅ Restore সম্পন্ন!');
+  renderTrashList();
+}
+
+async function permanentDeleteItem(trashId) {
+  if(!confirm('স্থায়ীভাবে মুছবেন?')) return;
+  const d=loadData();
+  const trashItems=window._fbData&&window._fbData.trash?Object.values(window._fbData.trash):[];
+  const item=trashItems.find(t=>t.id===trashId);
+  if(item) await fbDelete(item.originalPath);
+  await fbDelete(`ucdata/trash/${trashId}`);
+  showToast('🗑️ স্থায়ীভাবে মুছে গেছে');
+  renderTrashList();
+}
+
+function renderTrashList() {
+  const el=document.getElementById('trash-list');
+  if(!el) return;
+  const trashData=window._fbData&&window._fbData.trash?Object.values(window._fbData.trash):[];
+  const now=new Date();
+  if(!trashData.length){el.innerHTML='<div class="empty"><div class="e-icon">🗑️</div>Trash খালি</div>';return;}
+  const active=trashData.filter(t=>new Date(t.expireAt)>=now);
+  if(!active.length){el.innerHTML='<div class="empty"><div class="e-icon">🗑️</div>Trash খালি</div>';return;}
+  el.innerHTML=active.sort((a,b)=>b.deletedAt>a.deletedAt?1:-1).map(t=>{
+    const daysLeft=Math.ceil((new Date(t.expireAt)-now)/(24*60*60*1000));
+    return `<div class="list-item" style="border-left:3px solid var(--red);">
+      <div class="list-header">
+        <div><div class="list-name">${t.label}</div><div style="font-size:10px;color:var(--text2);">${t.type} · ${t.deletedAt?t.deletedAt.slice(0,10):''}</div></div>
+        <div style="font-size:10px;color:var(--red);">${daysLeft} দিন বাকি</div>
+      </div>
+      <div class="action-row">
+        <button class="btn-complete" onclick="restoreFromTrash('${t.id}')">↩️ Restore</button>
+        <button class="btn-del" onclick="permanentDeleteItem('${t.id}')">🗑️ স্থায়ী মুছ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════
+// INSTALLMENT EDIT/DELETE
+// ══════════════════════════════
+function editInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const inst=inv.installments.find(i=>i.no===instNo);
+  if(!inst) return;
+  document.getElementById('edit-modal-title').textContent=`কিস্তি ${instNo} এডিট`;
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>নির্ধারিত তারিখ</label><input type="date" id="e-inst-date" value="${inst.dueDate}"></div>
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inst-amount" value="${inst.amount}"></div>
+    ${inst.status==='paid'?`
+    <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="e-inst-paid-date" value="${inst.paidDate||''}"></div>
+    <div class="form-group"><label>আদায়ের পরিমাণ (৳)</label><input type="number" id="e-inst-paid-amount" value="${inst.paidAmount||inst.amount}"></div>
+    `:''}
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditInstallment('${invId}',${instNo})">✅ সেভ</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditInstallment(invId, instNo) {
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  const updatedInsts=inv.installments.map(i=>{
+    if(i.no!==instNo) return i;
+    const updated={...i,
+      dueDate:document.getElementById('e-inst-date').value,
+      amount:parseFloat(document.getElementById('e-inst-amount').value)||i.amount
+    };
+    if(i.status==='paid') {
+      updated.paidDate=document.getElementById('e-inst-paid-date')?.value||i.paidDate;
+      updated.paidAmount=parseFloat(document.getElementById('e-inst-paid-amount')?.value)||i.paidAmount;
+    }
+    return updated;
+  });
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts});
+  closeModal();showToast('✅ কিস্তি আপডেট হয়েছে!');
+  loadInstallmentList();
+}
+
+async function deleteInstallmentPayment(invId, instNo) {
+  if(!confirm('এই কিস্তির আদায় বাতিল করবেন?')) return;
+  const d=loadData();
+  const inv=d.investments.find(i=>i.id===invId);
+  if(!inv||!inv.installments) return;
+  // Reset installment to pending
+  const updatedInsts=inv.installments.map(i=>
+    i.no===instNo?{...i,status:'pending',paidDate:null,paidAmount:null}:i
+  );
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts,status:'Running'});
+  // Remove related recovery from trash
+  const relatedRec=d.recoveries.find(r=>r.invId===invId&&r.instNo===instNo);
+  if(relatedRec) await moveToTrash('recoveries',relatedRec.id,`কিস্তি ${instNo} আদায় বাতিল`);
+  showToast('🗑️ আদায় বাতিল হয়েছে');
+  loadInstallmentList();
+  renderDashboard();
+}
+
+// ══════════════════════════════
+// TRASH SYSTEM
+// ══════════════════════════════
+async function moveToTrash(type, id, label) {
+  if(!window.fbDb) return;
+  const now=new Date().toISOString();
+  const expiry=new Date(Date.now()+30*24*60*60*1000).toISOString();
+  // Mark as deleted in original location
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/${type}/${id}`),{deleted:true,deletedAt:now});
+  // Add to trash log
+  const trashId='trash_'+Date.now();
+  await fbWrite(`ucdata/trash/${trashId}`,{
+    id:trashId, type, itemId:id, label,
+    deletedAt:now, expiresAt:expiry
+  });
+  showToast('🗑️ Trash এ সরানো হয়েছে — ৩০ দিনে Restore করুন');
+}
+
+async function restoreFromTrash(trashId, type, itemId) {
+  if(!window.fbDb) return;
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/${type}/${itemId}`),{deleted:false,deletedAt:null});
+  await fbDelete(`ucdata/trash/${trashId}`);
+  showToast('✅ Restore হয়েছে!');
+  renderTrashList();
+  renderCurrentPage();
+}
+
+async function permanentDelete(trashId, type, itemId) {
+  if(!confirm('স্থায়ীভাবে মুছবেন? এটা আর ফিরিয়ে আনা যাবে না!')) return;
+  await fbDelete(`ucdata/${type}/${itemId}`);
+  await fbDelete(`ucdata/trash/${trashId}`);
+  showToast('🗑️ স্থায়ীভাবে মুছে ফেলা হয়েছে');
+  renderTrashList();
+}
+
+async function emptyTrash() {
+  if(!confirm('Trash এর সব আইটেম স্থায়ীভাবে মুছবেন?')) return;
+  const d=loadData();
+  for(const t of d.trash||[]) {
+    await fbDelete(`ucdata/${t.type}/${t.itemId}`);
+    await fbDelete(`ucdata/trash/${t.id}`);
+  }
+  showToast('🗑️ Trash খালি করা হয়েছে');
+  renderTrashList();
+}
+
+function renderTrashList() {
+  const el=document.getElementById('trash-list');
+  if(!el) return;
+  const d=loadData();
+  const trash=d.trash||[];
+  if(!trash.length){el.innerHTML='<div class="empty"><div class="e-icon">🗑️</div>Trash খালি</div>';return;}
+  const now=new Date();
+  el.innerHTML=[...trash].sort((a,b)=>b.deletedAt>a.deletedAt?1:-1).map(t=>{
+    const expiry=new Date(t.expiresAt);
+    const daysLeft=Math.ceil((expiry-now)/(1000*60*60*24));
+    const expired=daysLeft<=0;
+    return `<div class="list-item" style="border-left:3px solid var(--red);">
+      <div class="list-header">
+        <div><div class="list-name">${t.label}</div><div style="font-size:10px;color:var(--text2);">${t.type} · ${t.deletedAt?.slice(0,10)}</div></div>
+        <div style="font-size:11px;color:${expired?'var(--red)':'var(--orange)'};">${expired?'মেয়াদ শেষ':`${daysLeft} দিন বাকি`}</div>
+      </div>
+      ${!expired?`<div class="action-row">
+        <button class="btn-complete" onclick="restoreFromTrash('${t.id}','${t.type}','${t.itemId}')">↩️ Restore</button>
+        <button class="btn-del" onclick="permanentDelete('${t.id}','${t.type}','${t.itemId}')">🗑️</button>
+      </div>`:`<div class="action-row"><button class="btn-del" onclick="permanentDelete('${t.id}','${t.type}','${t.itemId}')">🗑️ স্থায়ী মুছ</button></div>`}
+    </div>`;
+  }).join('');
+}
+
+function downloadBackup() {
+  const d=loadData();
+  const backup=JSON.stringify({version:2,exportDate:new Date().toISOString(),app:'Unity Capital v2',data:d},null,2);
+  const blob=new Blob([backup],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='UC-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  URL.revokeObjectURL(url);showToast('✅ ডাউনলোড শুরু!');
+}
+
+function restoreFromFile(input) {
+  if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
+  const file=input.files[0];if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.data){showToast('❌ ভুল ফরম্যাট');return;}
+      if(!confirm('Firebase এ রিস্টোর করবেন? সব ডেটা replace হবে!')) return;
+      const bd=backup.data;
+      if(bd.members){const obj={};Object.values(bd.members).forEach(m=>obj[m.id]=m);await fbWrite('ucdata/members',obj);}
+      if(bd.deposits){const obj={};Object.values(bd.deposits).forEach(m=>obj[m.id]=m);await fbWrite('ucdata/deposits',obj);}
+      if(bd.investments){const obj={};Object.values(bd.investments).forEach(m=>obj[m.id]=m);await fbWrite('ucdata/investments',obj);}
+      if(bd.recoveries){const obj={};Object.values(bd.recoveries).forEach(m=>obj[m.id]=m);await fbWrite('ucdata/recoveries',obj);}
+      if(bd.expenses){const obj={};Object.values(bd.expenses).forEach(m=>obj[m.id]=m);await fbWrite('ucdata/expenses',obj);}
+      showToast('✅ রিস্টোর সম্পন্ন!');
+    }catch(err){showToast('❌ ফাইল পড়তে সমস্যা');}
+  };
+  reader.readAsText(file);input.value='';
+}
+
+// ══════════════════════════════
+// MODAL
+// ══════════════════════════════
+function openModal(){document.getElementById('edit-modal').classList.add('open');}
+function closeModal(){document.getElementById('edit-modal').classList.remove('open');}
+document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ══════════════════════════════
+// TOAST
+// ══════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════
+// PWA
+// ══════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+// Set today's date on expense form
+document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);
+</script>
 </body>
 </html>
