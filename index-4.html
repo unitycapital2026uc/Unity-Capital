@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Unity Capital</title>
+<meta name="theme-color" content="#0F3D3E">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F4EC;
+  --paper:#FFFFFF;
+  --ink:#12302E;
+  --ink-soft:#4B615F;
+  --teal:#0F3D3E;
+  --teal-2:#175651;
+  --gold:#C89B3C;
+  --gold-soft:#E8D9AF;
+  --red:#B23A3A;
+  --red-bg:#FBEAEA;
+  --orange:#C9772B;
+  --orange-bg:#FCF0DF;
+  --green:#2E7D4F;
+  --green-bg:#E9F5EC;
+  --border:#E4DFCE;
+  --radius:14px;
+  --shadow:0 2px 10px rgba(18,48,46,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind Siliguri',sans-serif;}
+h1,h2,h3,.serif{font-family:'Noto Serif Bengali',serif;}
+button,input,select{font-family:inherit;}
+.num{font-variant-numeric:tabular-nums;}
+::-webkit-scrollbar{width:0;height:0;}
+
+/* ---------- LOGIN ---------- */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 20%,var(--teal-2),var(--teal) 65%);color:#fff;padding:24px;}
+.login-badge{width:74px;height:74px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:26px;color:var(--teal);box-shadow:0 6px 18px rgba(0,0,0,.25);margin-bottom:14px;}
+#login-screen h1{font-size:24px;margin:0 0 2px;letter-spacing:.5px;}
+#login-screen p{opacity:.75;margin:0 0 26px;font-size:13.5px;}
+.pin-dots{display:flex;gap:14px;margin-bottom:26px;}
+.pin-dots span{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.5);transition:.15s;}
+.pin-dots span.filled{background:var(--gold);border-color:var(--gold);}
+.keypad{display:grid;grid-template-columns:repeat(3,64px);gap:14px;}
+.keypad button{width:64px;height:64px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:20px;font-weight:600;}
+.keypad button:active{background:rgba(255,255,255,.22);}
+.keypad button.ghost{border:none;background:transparent;color:rgba(255,255,255,.6);font-size:14px;}
+#login-error{color:#ffb4b4;font-size:13px;margin-top:14px;min-height:16px;}
+
+/* ---------- APP SHELL ---------- */
+#app{display:none;min-height:100vh;flex-direction:column;padding-bottom:70px;}
+.topbar{position:sticky;top:0;z-index:20;background:var(--teal);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.topbar .brand{display:flex;align-items:center;gap:9px;}
+.topbar .brand .mark{width:30px;height:30px;border-radius:50%;background:var(--gold);color:var(--teal);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:13px;}
+.topbar h1{font-size:16.5px;margin:0;}
+.role-badge{font-size:10.5px;background:rgba(255,255,255,.15);padding:3px 9px;border-radius:20px;margin-left:8px;font-weight:600;}
+.topbar button{background:none;border:none;color:#fff;font-size:19px;opacity:.85;}
+
+main{flex:1;padding:16px 14px 24px;max-width:640px;margin:0 auto;width:100%;}
+.page{display:none;animation:fadein .2s ease;}
+.page.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+.card{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow);}
+.card h2,.card h3{margin:0 0 12px;font-size:15.5px;color:var(--teal);}
+.section-title{font-family:'Noto Serif Bengali',serif;font-size:19px;color:var(--teal);margin:4px 0 14px;display:flex;align-items:center;justify-content:space-between;}
+
+/* dashboard stat grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);}
+.stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
+.stat .value{font-size:19px;font-weight:700;color:var(--teal);}
+.stat.wide{grid-column:1/-1;background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;border:none;}
+.stat.wide .label{color:rgba(255,255,255,.75);}
+.stat.wide .value{color:#fff;font-size:26px;}
+.stat.gold .value{color:var(--gold);}
+.stat.red .value{color:var(--red);}
+.stat.green .value{color:var(--green);}
+
+.donut-wrap{display:flex;align-items:center;gap:18px;}
+.donut{width:110px;height:110px;border-radius:50%;flex-shrink:0;}
+.legend{flex:1;display:flex;flex-direction:column;gap:7px;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+.legend-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-item .pct{margin-left:auto;font-weight:600;}
+
+.list-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);gap:10px;}
+.list-item:last-child{border-bottom:none;}
+.list-item .main{font-weight:600;font-size:14px;}
+.list-item .sub{font-size:12px;color:var(--ink-soft);}
+.list-item .right{text-align:right;}
+.tag{font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.tag.overdue{background:var(--red-bg);color:var(--red);}
+.tag.upcoming{background:var(--orange-bg);color:var(--orange);}
+.tag.future{background:var(--bg);color:var(--ink-soft);border:1px solid var(--border);}
+.tag.completed{background:var(--green-bg);color:var(--green);}
+.tag.running{background:var(--gold-soft);color:#7a5b12;}
+
+.row-actions{display:flex;gap:6px;}
+.icon-btn{border:1px solid var(--border);background:var(--paper);border-radius:8px;padding:5px 8px;font-size:13px;}
+.icon-btn.danger{color:var(--red);border-color:#ecc;}
+
+.item-card{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--paper);}
+.item-card.overdue{border-left:4px solid var(--red);}
+.item-card.upcoming{border-left:4px solid var(--orange);}
+.item-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.progress-bar{height:6px;border-radius:6px;background:var(--bg);overflow:hidden;margin:8px 0;}
+.progress-bar .fill{height:100%;background:var(--gold);}
+
+.fab{position:fixed;right:18px;bottom:84px;width:54px;height:54px;border-radius:50%;background:var(--teal);color:#fff;border:none;font-size:26px;box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:15;}
+
+.tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:4px;}
+.tabs button{flex:1;border:none;background:none;padding:9px 4px;font-size:12.5px;border-radius:9px;color:var(--ink-soft);font-weight:600;}
+.tabs button.active{background:var(--teal);color:#fff;}
+
+.form-group{margin-bottom:13px;}
+.form-group label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
+.form-group input,.form-group select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:14.5px;color:var(--ink);}
+.form-group input:focus,.form-group select:focus{outline:2px solid var(--teal);outline-offset:1px;}
+.form-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.btn{display:block;width:100%;padding:13px;border-radius:11px;border:none;font-size:15px;font-weight:700;text-align:center;}
+.btn-primary{background:var(--teal);color:#fff;}
+.btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+.btn-danger{background:var(--red-bg);color:var(--red);}
+.btn-gold{background:var(--gold);color:var(--teal);}
+
+.empty{text-align:center;padding:34px 10px;color:var(--ink-soft);font-size:13.5px;}
+.empty .emoji{font-size:30px;display:block;margin-bottom:8px;}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--paper);border-top:1px solid var(--border);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom);}
+.bottom-nav button{flex:1;border:none;background:none;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-soft);font-size:10.5px;font-weight:600;}
+.bottom-nav button .ic{font-size:19px;}
+.bottom-nav button.active{color:var(--teal);}
+.bottom-nav button.active .ic{transform:translateY(-1px);}
+
+/* modal */
+#modal-overlay{position:fixed;inset:0;background:rgba(18,48,46,.45);z-index:50;display:none;align-items:flex-end;justify-content:center;}
+#modal-overlay.show{display:flex;}
+#modal{background:var(--paper);width:100%;max-width:640px;max-height:88vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));animation:slideup .22s ease;}
+@keyframes slideup{from{transform:translateY(30px);opacity:0;}to{transform:none;opacity:1;}}
+#modal .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+#modal .modal-head h3{margin:0;color:var(--teal);}
+#modal .modal-head button{border:none;background:var(--bg);width:30px;height:30px;border-radius:50%;font-size:15px;}
+
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:60;box-shadow:var(--shadow);opacity:0;transition:.25s;pointer-events:none;}
+.toast.show{opacity:1;top:20px;}
+
+.locked-note{background:var(--orange-bg);color:var(--orange);font-size:12px;padding:9px 12px;border-radius:10px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <div class="login-badge">UC</div>
+  <h1>Unity Capital</h1>
+  <p>প্রবেশের জন্য ৪ সংখ্যার PIN দিন</p>
+  <div class="pin-dots" id="pinDots">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="keypad" id="keypad">
+    <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+    <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+    <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+    <button class="ghost" data-k="clear">মুছুন</button><button data-k="0">0</button><button class="ghost" data-k="back">⌫</button>
+  </div>
+  <div id="login-error"></div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+  <div class="topbar">
+    <div class="brand"><div class="mark">UC</div><h1>Unity Capital<span class="role-badge" id="roleBadge"></span></h1></div>
+    <button id="logoutBtn" title="লগআউট">⏻</button>
+  </div>
+
+  <main id="pages">
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="section-title">📊 Dashboard</div>
+      <div class="stat-grid" id="dashStats"></div>
+
+      <div class="card">
+        <h2>মালিকানা বিভাজন</h2>
+        <div class="donut-wrap">
+          <div class="donut" id="ownerDonut"></div>
+          <div class="legend" id="ownerLegend"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>আসন্ন ও বকেয়া কিস্তি</h2>
+        <div id="dueWidget"></div>
+      </div>
+    </section>
+
+    <!-- DEPOSITS -->
+    <section class="page" id="page-deposits">
+      <div class="section-title">💳 চাঁদা (Monthly Deposits)</div>
+      <div class="card" id="depositLockNote" style="display:none"><div class="locked-note">শুধু দেখার অধিকার — নতুন জমা দিতে Editor PIN দিয়ে প্রবেশ করুন</div></div>
+      <div class="card"><h2>সাম্প্রতিক জমা</h2><div id="depositList"></div></div>
+    </section>
+
+    <!-- INVESTMENTS -->
+    <section class="page" id="page-investments">
+      <div class="section-title">📈 বিনিয়োগ</div>
+      <div class="tabs" id="invTabs">
+        <button data-t="list" class="active">তালিকা</button>
+        <button data-t="recover">কিস্তি আদায়</button>
+      </div>
+      <div id="invTabList"><div id="investmentList"></div></div>
+      <div id="invTabRecover" style="display:none"></div>
+    </section>
+
+    <!-- EXPENSES -->
+    <section class="page" id="page-expenses">
+      <div class="section-title">💸 খরচ</div>
+      <div class="card"><h2>খরচের তালিকা</h2><div id="expenseList"></div></div>
+    </section>
+
+    <!-- MEMBERS -->
+    <section class="page" id="page-members">
+      <div class="section-title">👥 সদস্য</div>
+      <div class="tabs" id="memberTabs">
+        <button data-t="profile" class="active">প্রোফাইল</button>
+        <button data-t="transfer">শেয়ার ট্রান্সফার</button>
+        <button data-t="new">নতুন সদস্য</button>
+        <button data-t="exit">Exit</button>
+      </div>
+      <div id="memTabProfile"><div id="memberProfileList"></div></div>
+      <div id="memTabTransfer" style="display:none"></div>
+      <div id="memTabNew" style="display:none"></div>
+      <div id="memTabExit" style="display:none"></div>
+    </section>
+
+    <!-- BACKUP -->
+    <section class="page" id="page-backup">
+      <div class="section-title">💾 ব্যাকআপ</div>
+      <div class="card">
+        <h2>সিঙ্ক স্ট্যাটাস</h2>
+        <div class="list-item"><div><div class="main">Firebase Auto-Sync</div><div class="sub" id="syncStatus">সংযুক্ত হচ্ছে…</div></div><span class="tag completed" id="syncTag">চালু</span></div>
+      </div>
+      <div class="card">
+        <h2>JSON ব্যাকআপ</h2>
+        <button class="btn btn-primary" id="downloadBackupBtn" style="margin-bottom:10px;">⬇️ JSON ডাউনলোড করুন</button>
+        <label class="btn btn-secondary" style="display:block;cursor:pointer;" id="restoreLabel">⬆️ ফাইল থেকে Restore করুন
+          <input type="file" id="restoreFile" accept="application/json" style="display:none;">
+        </label>
+      </div>
+      <div class="card">
+        <h2>🗑️ Trash</h2>
+        <div class="form-hint" style="margin-bottom:10px;">৩০ দিনের মধ্যে Restore করা যাবে, পরে স্থায়ীভাবে মুছে যাবে।</div>
+        <div id="trashList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard" class="active"><span class="ic">📊</span>হোম</button>
+    <button data-page="deposits"><span class="ic">💳</span>চাঁদা</button>
+    <button data-page="investments"><span class="ic">📈</span>বিনিয়োগ</button>
+    <button data-page="expenses"><span class="ic">💸</span>খরচ</button>
+    <button data-page="members"><span class="ic">👥</span>সদস্য</button>
+    <button data-page="backup"><span class="ic">💾</span>ব্যাকআপ</button>
+  </nav>
+
+  <button class="fab" id="fabBtn">+</button>
+</div>
+
+<div id="modal-overlay"><div id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
