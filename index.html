@@ -229,10 +229,7 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Tiro
         <div class="sec-head">⚙️ মালিকানা বিভাজন</div>
         <div id="ownership-list"></div>
       </div>
-      <div class="card" id="upcoming-inst-card" style="display:none;">
-        <div class="sec-head" style="color:var(--gold);">🔔 আসন্ন কিস্তি</div>
-        <div id="upcoming-inst-list"></div>
-      </div>
+      <div id="upcoming-installments-widget"></div>
     </div>
 
     <!-- DEPOSIT -->
@@ -543,12 +540,13 @@ const DEFAULT_MEMBERS = [
 function loadData() {
   const d = window._fbData || {};
   return {
-    members: Object.values(d.members||{}).sort((a,b)=>a.id>b.id?1:-1),
-    deposits: Object.values(d.deposits||{}),
-    investments: Object.values(d.investments||{}),
-    recoveries: Object.values(d.recoveries||{}),
-    expenses: Object.values(d.expenses||{}),
-    transfers: Object.values(d.transfers||{}),
+    members: Object.values(d.members||{}).filter(x=>!x.deleted).sort((a,b)=>a.id>b.id?1:-1),
+    deposits: Object.values(d.deposits||{}).filter(x=>!x.deleted),
+    investments: Object.values(d.investments||{}).filter(x=>!x.deleted),
+    recoveries: Object.values(d.recoveries||{}).filter(x=>!x.deleted),
+    expenses: Object.values(d.expenses||{}).filter(x=>!x.deleted),
+    transfers: Object.values(d.transfers||{}).filter(x=>!x.deleted),
+    trash: Object.values(d.trash||{}),
   };
 }
 
@@ -710,6 +708,7 @@ function renderCurrentPage() {
   else if(currentPage==='deposit') renderRecentDeposits();
   else if(currentPage==='investment') renderInvestmentList();
   else if(currentPage==='expenses') renderExpenseList();
+  else if(currentPage==='backup') renderTrashList();
   else if(currentPage==='members') renderMembersPage();
 }
 
@@ -740,49 +739,32 @@ function renderDashboard() {
   renderUpcomingInstallments();
 }
 
-function renderUpcomingInstallments() {
-  const d=loadData();
-  const el=document.getElementById('upcoming-installments-list');
+function renderUpcomingInstallments() { renderUpcomingWidget(); }
+
+function renderUpcomingWidget() {
+  const el=document.getElementById('upcoming-installments-widget');
   if(!el) return;
-  
-  const today=new Date(); today.setHours(0,0,0,0);
-  const items=[];
-  
-  d.investments.forEach(inv=>{
-    if(!inv.installments) return;
-    inv.installments.forEach(inst=>{
-      if(inst.status==='paid') return;
-      const nd=new Date(inst.expectedDate); nd.setHours(0,0,0,0);
-      const diff=Math.round((nd-today)/(1000*60*60*24));
-      if(diff<=14) { // Show next 14 days + overdue
-        items.push({inv,inst,diff});
-      }
+  const d=loadData();
+  const today=new Date().toISOString().slice(0,10);
+  const sevenDays=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const alerts=[];
+  d.investments.filter(i=>i.status==='Running'&&i.installments).forEach(inv=>{
+    inv.installments.filter(i=>i.status!=='paid').forEach(inst=>{
+      if(inst.dueDate<=sevenDays) alerts.push({invName:inv.name,instNo:inst.no,dueDate:inst.dueDate,amount:inst.amount,isOverdue:inst.dueDate<today});
     });
   });
-  
-  items.sort((a,b)=>a.diff-b.diff);
-  
-  if(!items.length) {
-    el.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center;padding:8px;">কোনো আসন্ন কিস্তি নেই ✅</div>';
-    return;
-  }
-  
-  el.innerHTML=items.map(({inv,inst,diff})=>{
-    const isOverdue=diff<0;
-    const isToday=diff===0;
-    const color=isOverdue?'var(--red)':isToday?'var(--orange)':diff<=7?'var(--orange)':'var(--text2)';
-    const icon=isOverdue?'⚠️':isToday?'🔴':'🔔';
-    const diffText=isOverdue?`${Math.abs(diff)} দিন বকেয়া`:isToday?'আজ':`${diff} দিন পরে`;
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-size:12px;font-weight:700;">${icon} ${inv.name}</div>
-        <div style="font-size:11px;color:${color};">${inst.num} নং কিস্তি · ${diffText}</div>
-        <div style="font-size:10px;color:var(--text2);">${inst.expectedDate}</div>
-      </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:${color};">${fmt(inst.amount)}</div>
-    </div>`;
-  }).join('');
+  if(!alerts.length){el.innerHTML='';return;}
+  alerts.sort((a,b)=>a.dueDate>b.dueDate?1:-1);
+  el.innerHTML=`<div class="card" style="border-color:var(--orange);margin-top:4px;">
+    <div class="sec-head" style="color:var(--orange);">🔔 আসন্ন ও বকেয়া কিস্তি</div>
+    ${alerts.map(a=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+      <div><div style="font-size:12px;font-weight:700;">${a.invName} — কিস্তি ${a.instNo}</div>
+      <div style="font-size:10px;color:${a.isOverdue?'var(--red)':'var(--orange)'};">${a.isOverdue?'⚠️ বকেয়া: ':'🔔 তারিখ: '}${a.dueDate}</div></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:${a.isOverdue?'var(--red)':'var(--orange)'};">${fmt(a.amount)}</div>
+    </div>`).join('')}
+  </div>`;
 }
+
 
 // ══════════════════════════════
 // DEPOSITS
@@ -1068,10 +1050,16 @@ function editInvestment(id) {
   document.getElementById('edit-modal-title').textContent='বিনিয়োগ এডিট';
   document.getElementById('edit-modal-body').innerHTML=`
     <div class="form-group"><label>প্রকল্পের নাম</label><input type="text" id="e-inv-name" value="${inv.name}"></div>
+    <div class="form-group"><label>তারিখ</label><input type="date" id="e-inv-date" value="${inv.date}"></div>
     <div class="form-row">
-      <div class="form-group"><label>তারিখ</label><input type="date" id="e-inv-date" value="${inv.date}"></div>
-      <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" id="e-inv-amount" value="${inv.amount}"></div>
+      <div class="form-group"><label>ক্রয়মূল্য (৳)</label><input type="number" id="e-inv-amount" value="${inv.amount}"></div>
+      <div class="form-group"><label>বাজারমূল্য (৳)</label><input type="number" id="e-inv-market" value="${inv.marketPrice||''}"></div>
     </div>
+    <div class="form-row">
+      <div class="form-group"><label>লাভ %</label><input type="number" id="e-inv-pct" value="${inv.profitPct||''}"></div>
+      <div class="form-group"><label>আদায় লক্ষ্য (৳)</label><input type="number" id="e-inv-target" value="${inv.target||''}"></div>
+    </div>
+    <div class="form-group"><label>অগ্রিম (৳)</label><input type="number" id="e-inv-advance" value="${inv.advance||0}"></div>
     <div class="form-group"><label>নোট</label><textarea id="e-inv-note">${inv.note||''}</textarea></div>
     <div style="display:flex;gap:9px;margin-top:4px;">
       <button class="btn btn-gold" onclick="saveEditInvestment('${id}')">✅ সেভ</button>
@@ -1085,6 +1073,10 @@ async function saveEditInvestment(id) {
     name:document.getElementById('e-inv-name').value,
     date:document.getElementById('e-inv-date').value,
     amount:parseFloat(document.getElementById('e-inv-amount').value)||0,
+    marketPrice:parseFloat(document.getElementById('e-inv-market').value)||0,
+    profitPct:parseFloat(document.getElementById('e-inv-pct').value)||0,
+    target:parseFloat(document.getElementById('e-inv-target').value)||0,
+    advance:parseFloat(document.getElementById('e-inv-advance').value)||0,
     note:document.getElementById('e-inv-note').value
   });
   closeModal();showToast('✅ আপডেট হয়েছে!');
@@ -1369,6 +1361,54 @@ function calcRecoveryBreakdown() {
 
 
 function checkRecovery() { calcRecoveryBreakdown(); }
+
+function editRecovery(recId, invId) {
+  const d=loadData();
+  const rec=d.recoveries.find(x=>x.id===recId);
+  if(!rec) return;
+  document.getElementById('edit-modal-title').textContent='আদায় এডিট';
+  document.getElementById('edit-modal-body').innerHTML=`
+    <div class="form-group"><label>আদায়ের তারিখ</label><input type="date" id="e-rec-date" value="${rec.date}"></div>
+    <div class="form-group"><label>আদায়ের পরিমাণ (৳)</label><input type="number" id="e-rec-amt" value="${rec.amount||rec.principal||0}"></div>
+    <div style="display:flex;gap:9px;margin-top:4px;">
+      <button class="btn btn-gold" onclick="saveEditRecovery('${recId}','${invId}')">✅ সেভ</button>
+      <button class="btn btn-red" onclick="deleteRecovery('${recId}','${invId}')" style="flex:0.4;">🗑️</button>
+    </div>`;
+  openModal();
+}
+
+async function saveEditRecovery(recId, invId) {
+  const date=document.getElementById('e-rec-date').value;
+  const amount=parseFloat(document.getElementById('e-rec-amt').value)||0;
+  const d=loadData();
+  const inv=d.investments.find(x=>x.id===invId);
+  const otherRecs=d.recoveries.filter(r=>r.id!==recId&&r.invId===invId);
+  const alreadyReturned=otherRecs.reduce((s,r)=>s+(r.amount||r.principal||0),0);
+  const cost=inv?.amount||0;
+  const remaining=cost-alreadyReturned;
+  let principal=0,profit=0;
+  if(remaining<=0){profit=amount;}
+  else if(amount<=remaining){principal=amount;}
+  else{principal=remaining;profit=amount-remaining;}
+  await fbUpdate(window.fbRef(window.fbDb,`ucdata/recoveries/${recId}`),{date,amount,principal,profit,paidAmount:amount});
+  closeModal();showToast('✅ আদায় আপডেট হয়েছে!');
+  loadInstallments();renderDashboard();
+}
+
+async function deleteRecovery(recId, invId) {
+  if(!confirm('Trash এ পাঠাবেন?')) return;
+  const d=loadData();
+  const rec=d.recoveries.find(x=>x.id===recId);
+  const label=rec?`আদায়: ${rec.date} - ${fmt(rec.amount||rec.principal||0)}`:'আদায়';
+  const inv=d.investments.find(x=>x.id===invId);
+  if(inv&&inv.installments&&rec?.instNo) {
+    const updatedInsts=inv.installments.map(i=>i.no===rec.instNo?{...i,status:'pending',paidDate:null,paidAmount:null}:i);
+    await fbUpdate(window.fbRef(window.fbDb,`ucdata/investments/${invId}`),{installments:updatedInsts});
+  }
+  await moveToTrash('recoveries',recId,label);
+  closeModal();showToast('🗑️ Trash এ সরানো হয়েছে');
+  loadInstallments();renderDashboard();
+}
 
 async function saveRecovery() {
   if(currentRole!=='editor'){showToast('🔒 শুধু Editor');return;}
